@@ -76,7 +76,10 @@ const renderLine = (
   }
 };
 
-const reflect = ([x, y]: [number, number], [[x1, y1], [x2, y2]]: [[number, number], [number, number]]): [number, number] => {
+const reflect = (
+  [x, y]: [number, number],
+  [[x1, y1], [x2, y2]]: [[number, number], [number, number]]
+): [number, number] => {
   if (x1 === x2) {
     return [2 * x1 - x, y];
   } else if (y1 === y2) {
@@ -91,7 +94,12 @@ const reflect = ([x, y]: [number, number], [[x1, y1], [x2, y2]]: [[number, numbe
     return [x_, y_];
   }
 };
-const rotate = ([x, y]: [number, number], [x1, y1]: [number, number], angle: number, isClockwise: boolean): [number, number] => {
+const rotate = (
+  [x, y]: [number, number],
+  [x1, y1]: [number, number],
+  angle: number,
+  isClockwise: boolean
+): [number, number] => {
   if (isClockwise) {
     let newX =
       (x - x1) * Math.cos((angle * Math.PI) / 180) +
@@ -114,13 +122,23 @@ const rotate = ([x, y]: [number, number], [x1, y1]: [number, number], angle: num
     return [newX, newY];
   }
 };
-const translate = ([x, y]: [number, number], [[x1, y1], [x2, y2]]: [[number, number], [number, number]]): [number, number] => {
+const translate = (
+  [x, y]: [number, number],
+  [[x1, y1], [x2, y2]]: [[number, number], [number, number]]
+): [number, number] => {
   return [x + x2 - x1, y + y2 - y1];
 };
-const enlarge = ([x, y]: [number, number], [x1, y1]: [number, number], f: number): [number, number] => {
+const enlarge = (
+  [x, y]: [number, number],
+  [x1, y1]: [number, number],
+  f: number
+): [number, number] => {
   return [x1 + f * (x - x1), y1 + f * (y - y1)];
 };
-const lineEquation = ([[x1, y1], [x2, y2]]: [[number, number], [number, number]]): string => {
+const lineEquation = ([[x1, y1], [x2, y2]]: [
+  [number, number],
+  [number, number]
+]): string => {
   if (x1 === x2) {
     return `x = ${x1}`;
   } else if (y1 === y2) {
@@ -138,10 +156,26 @@ const lineEquation = ([[x1, y1], [x2, y2]]: [[number, number], [number, number]]
   }
 };
 
-function Graph({ x1, x2, y1, y2 }: { x1: number, x2: number, y1: number, y2: number }) {
-  const [hoveredPoint, setHoveredPoint] = useState<[number, number]|null>(null);
-  const [hoveredObjectPoint, setHoveredObjectPoint] = useState<[number, number]|null>(null);
-  const [selectedObjectPoint, setSelectedObjectPoint] = useState<[number, number]|null>([-4, 5]);
+function Graph({
+  x1,
+  x2,
+  y1,
+  y2,
+}: {
+  x1: number;
+  x2: number;
+  y1: number;
+  y2: number;
+}) {
+  const [hoveredPoint, setHoveredPoint] = useState<[number, number] | null>(
+    null
+  );
+  const [hoveredObjectPoint, setHoveredObjectPoint] = useState<
+    [number, number] | null
+  >(null);
+  const [selectedObjectPoint, setSelectedObjectPoint] = useState<
+    [number, number] | null
+  >([-4, 5]);
   const [transformation, setTransformation] = useState<string>("reflection");
   const [tool, setTool] = useState<string>("select");
   const [zoom, setZoom] = useState<number>(100);
@@ -149,9 +183,13 @@ function Graph({ x1, x2, y1, y2 }: { x1: number, x2: number, y1: number, y2: num
   const [showInfo, setShowInfo] = useState<boolean>(false);
   const [showHelp1, setShowHelp1] = useState<boolean>(true);
   const [showHelp2, setShowHelp2] = useState<boolean>(false);
-  const [isVisited, setIsVisited] = useState<{[key: string]: boolean}>({rotation:false,translation:false,enlargement:false});
+  const [isVisited, setIsVisited] = useState<{ [key: string]: boolean }>({
+    rotation: false,
+    translation: false,
+    enlargement: false,
+  });
   const [showDeletePrompt, setShowDeletePrompt] = useState<boolean>(false);
-const [showCoords, setShowCoords] = useState<boolean>(false);
+  const [showCoords, setShowCoords] = useState<boolean>(false);
   // object
   const [objects, setObjects] = useState<objectsState>({
     demo: [
@@ -160,59 +198,85 @@ const [showCoords, setShowCoords] = useState<boolean>(false);
       [-2, 5],
     ],
   });
-  const [tempObjectPoints, setTempObjectPoints] = useState<[number, number][]>([]);
+  const [tempObjectPoints, setTempObjectPoints] = useState<[number, number][]>(
+    []
+  );
   const [selectedObject, setSelectedObject] = useState<string>("");
-  const [selectionCoordinates, setSelectionCoordinates] = useState<{ x1: number; x2: number; y1: number; y2: number }>({
+  const [selectionCoordinates, setSelectionCoordinates] = useState<{
+    x1: number;
+    x2: number;
+    y1: number;
+    y2: number;
+  }>({
     x1: NaN,
     x2: NaN,
     y1: NaN,
     y2: NaN,
   });
-    // reflection
-    const [reflectImages, setReflectImages] = useState<objectsState>({});
-    const [mirrorLinePoints, setMirrorLinePoints] = useState<[[number, number], [number, number]]>([
-      [-5, 0],
-      [0, 5],
-    ]);
-    const [tempMirrorLinePoints, setTempMirrorLinePoints] = useState<[number, number][]>([]);
-  
-    // rotation
-    const [centerOfRotation, setCenterOfRotation] = useState<[number, number]|null>([-2, 2]);
-    const [isClockwise, setIsClockwise] = useState<boolean>(true);
-    const [rotationAngle, setRotationAngle] = useState<number>(90);
-    const [rotatedImages, setRotatedImages] = useState<objectsState>({});
-  
-    //translation
-    const [tempTransVector, setTempTransVector] = useState<[number, number][]|null>([]);
-    const [transVector, setTransVector] = useState<[[number, number],[number,number]]>([
-      [0, 0],
-      [3, 1],
-    ]);
-    const [transImages, setTransImages] = useState<objectsState>({});
-  
-    // enlargement
-    const [enlargedImages, setEnlargedImages] = useState<objectsState>({});
-    const [enlargementFactor, setEnlargementFactor] = useState<number>(2);
-    const [centerOfEnlargement, setCenterOfEnlargement] = useState<[number, number]>([-9, 9]);
-  
-    const graphBox = useRef<HTMLDivElement>(null);
-    const scrollBox = useRef<HTMLDivElement>(null);
-  
-    const color1: string = "#1783b8";
-    const color2: string = "#4dc0ae";
-    const zoomFactor: number = 30;
-    // console.log(objects);
-useEffect(()=>{
-  if(transformation!=="reflection"){
-    if(!isVisited[transformation as keyof typeof isVisited]){
-      setShowHelp2(true);
-      setIsVisited({...isVisited,[transformation]:true})
+  // reflection
+  const [reflectImages, setReflectImages] = useState<objectsState>({});
+  const [mirrorLinePoints, setMirrorLinePoints] = useState<
+    [[number, number], [number, number]]
+  >([
+    [-5, 0],
+    [0, 5],
+  ]);
+  const [tempMirrorLinePoints, setTempMirrorLinePoints] = useState<
+    [number, number][]
+  >([]);
+
+  // rotation
+  const [centerOfRotation, setCenterOfRotation] = useState<
+    [number, number] | null
+  >([-2, 2]);
+  const [isClockwise, setIsClockwise] = useState<boolean>(true);
+  const [rotationAngle, setRotationAngle] = useState<number>(90);
+  const [rotatedImages, setRotatedImages] = useState<objectsState>({});
+
+  //translation
+  const [tempTransVector, setTempTransVector] = useState<
+    [number, number][] | null
+  >([]);
+  const [transVector, setTransVector] = useState<
+    [[number, number], [number, number]]
+  >([
+    [0, 0],
+    [3, 1],
+  ]);
+  const [transImages, setTransImages] = useState<objectsState>({});
+
+  // enlargement
+  const [enlargedImages, setEnlargedImages] = useState<objectsState>({});
+  const [enlargementFactor, setEnlargementFactor] = useState<number>(2);
+  const [centerOfEnlargement, setCenterOfEnlargement] = useState<
+    [number, number]
+  >([-9, 9]);
+
+  const graphBox = useRef<HTMLDivElement>(null);
+  const scrollBox = useRef<HTMLDivElement>(null);
+
+  const color1: string = "#1783b8";
+  const color2: string = "#4dc0ae";
+  const zoomFactor: number = 30;
+
+  // drag
+  const [dragStart, setDragStart] = useState<[number, number] | null>(null);
+  const [draggingObject, setDraggingObject] = useState<string>("");
+  const [draggingPoint, setDraggingPoint] = useState<[string, number] | null>(
+    null
+  );
+  const [draggingSpecialPoint, setDraggingSpecialPoint] = useState<string>("");
+
+  // console.log(objects);
+  useEffect(() => {
+    if (transformation !== "reflection") {
+      if (!isVisited[transformation as keyof typeof isVisited]) {
+        setShowHelp2(true);
+        setIsVisited({ ...isVisited, [transformation]: true });
+      }
     }
-  }
-},[transformation])
-// console.log(isVisited);
-
-
+  }, [transformation]);
+  // console.log(isVisited);
 
   // reflection
   useEffect(() => {
@@ -313,14 +377,16 @@ useEffect(()=>{
   }, []);
   // min zoom
   useEffect(() => {
-    if(scrollBox.current){let height = scrollBox.current.clientHeight;
-    let width = scrollBox.current.clientWidth;
-    setMinZoom(
-      Math.max(
-        (height * 100) / ((y2 - y1) * zoomFactor),
-        (width * 100) / ((x2 - x1) * zoomFactor)
-      )
-    );}
+    if (scrollBox.current) {
+      let height = scrollBox.current.clientHeight;
+      let width = scrollBox.current.clientWidth;
+      setMinZoom(
+        Math.max(
+          (height * 100) / ((y2 - y1) * zoomFactor),
+          (width * 100) / ((x2 - x1) * zoomFactor)
+        )
+      );
+    }
   }, [scrollBox]);
 
   const renderRipple = (x: number, y: number) => {
@@ -452,8 +518,8 @@ useEffect(()=>{
     let oldZoom = zoom;
 
     if (scrollBox.current) {
-          let oldScrollX = scrollBox.current.scrollLeft;
-    let oldScrollY = scrollBox.current.scrollTop;
+      let oldScrollX = scrollBox.current.scrollLeft;
+      let oldScrollY = scrollBox.current.scrollTop;
       let focusX = oldScrollX + scrollBox.current.clientWidth / 2;
       let focusY = oldScrollY + scrollBox.current.clientHeight / 2;
       const scrollLeft =
@@ -484,128 +550,133 @@ useEffect(()=>{
     setZoom(z);
   };
   const handleMove = (e: any) => {
-    if(graphBox.current){let rect = graphBox.current.getBoundingClientRect();
-    let x =
-      Math.round(
-        ((e.clientX - rect.x) * (x2 - x1)) /
-          (((x2 - x1) * zoomFactor * zoom) / 100)
-      ) + x1;
-    let y =
-      Math.round(
-        ((e.clientY - rect.height - rect.y) * (y1 - y2)) /
-          (((y2 - y1) * zoomFactor * zoom) / 100)
-      ) + y1;
-    e = e.touches?.[0] || e;
-    if (x > x1 && x < x2 && y > y1 && y < y2) {
-      setHoveredPoint([x, y]);
-      if (tool == "select") {
-        if (
-          Object.values(objects)
-            .flat()
-            .some((point) => point.join(",") === `${x},${y}`)
-        ) {
-          setHoveredObjectPoint([x, y]);
-        } else {
-          setHoveredObjectPoint(null);
+    if (graphBox.current) {
+      let rect = graphBox.current.getBoundingClientRect();
+      let x =
+        Math.round(
+          ((e.clientX - rect.x) * (x2 - x1)) /
+            (((x2 - x1) * zoomFactor * zoom) / 100)
+        ) + x1;
+      let y =
+        Math.round(
+          ((e.clientY - rect.height - rect.y) * (y1 - y2)) /
+            (((y2 - y1) * zoomFactor * zoom) / 100)
+        ) + y1;
+      e = e.touches?.[0] || e;
+      if (x > x1 && x < x2 && y > y1 && y < y2) {
+        setHoveredPoint([x, y]);
+        if (tool == "select") {
+          if (
+            Object.values(objects)
+              .flat()
+              .some((point) => point.join(",") === `${x},${y}`)
+          ) {
+            setHoveredObjectPoint([x, y]);
+          } else {
+            setHoveredObjectPoint(null);
+          }
         }
+      } else {
+        setHoveredPoint(null);
       }
-    } else {
-      setHoveredPoint(null);
-    }}
+    }
   };
 
   const handleClick = (e: any) => {
-    if(graphBox.current){let rect = graphBox.current.getBoundingClientRect();
-    let x =
-      Math.round(
-        ((e.clientX - rect.x) * (x2 - x1)) /
-          (((x2 - x1) * zoomFactor * zoom) / 100)
-      ) + x1;
-    let y =
-      Math.round(
-        ((e.clientY - rect.height - rect.y) * (y1 - y2)) /
-          (((y2 - y1) * zoomFactor * zoom) / 100)
-      ) + y1;
-    e = e.touches?.[0] || e;
-    if (x > x1 && x < x2 && y > y1 && y < y2) {
-      if (tool == "polygon") {
-        let temp = tempObjectPoints;
-        // console.log(temp.length);
-        // if(temp.length<=1){
-        //   setObjectPoints([])
-        // }
-        if (temp.some((point) => point.join(",") === `${x},${y}`)) {
-          if (tempObjectPoints.length <= 1) {
-            setTempObjectPoints([]);
+    if (graphBox.current) {
+      let rect = graphBox.current.getBoundingClientRect();
+      e = e.touches?.[0] || e;
+      let x =
+        Math.round(
+          ((e.clientX - rect.x) * (x2 - x1)) /
+            (((x2 - x1) * zoomFactor * zoom) / 100)
+        ) + x1;
+      let y =
+        Math.round(
+          ((e.clientY - rect.height - rect.y) * (y1 - y2)) /
+            (((y2 - y1) * zoomFactor * zoom) / 100)
+        ) + y1;
+      if (x > x1 && x < x2 && y > y1 && y < y2) {
+        if (tool == "polygon") {
+          let temp = tempObjectPoints;
+          // console.log(temp.length);
+          // if(temp.length<=1){
+          //   setObjectPoints([])
+          // }
+          if (temp.some((point) => point.join(",") === `${x},${y}`)) {
+            if (tempObjectPoints.length <= 1) {
+              setTempObjectPoints([]);
+            } else {
+              let id = Math.random().toString(36).slice(2, 7);
+              while (Object.keys(objects).includes(id)) {
+                id = Math.random().toString(36).slice(2, 7);
+              }
+              setObjects({ ...objects, [id]: [...tempObjectPoints] });
+              setTempObjectPoints([]);
+              console.log("includes");
+              setSelectedObject(id);
+              setTool("select");
+            }
+            // setTool("select")
           } else {
-            let id = Math.random().toString(36).slice(2, 7);
-            while (Object.keys(objects).includes(id)) {
-              id = Math.random().toString(36).slice(2, 7);
-            }
-            setObjects({ ...objects, [id]: [...tempObjectPoints] });
-            setTempObjectPoints([]);
-            console.log("includes");
+            console.log("not includes");
+            setTempObjectPoints([...tempObjectPoints, [x, y]]);
           }
+        } else if (tool == "mirror") {
+          let temp: [number, number][] = tempMirrorLinePoints;
+          // console.log(temp.length);
+          if (temp.length == 0) {
+            setTempMirrorLinePoints([[x, y]]);
+          } else {
+            setMirrorLinePoints([temp[0], [x, y]]);
+            setTempMirrorLinePoints([]);
+            // setTool("select")
+          }
+        } else if (tool == "rotCenter") {
+          setCenterOfRotation([x, y]);
           // setTool("select")
-        } else {
-          console.log("not includes");
-          setTempObjectPoints([...tempObjectPoints, [x, y]]);
-        }
-      } else if (tool == "mirror") {
-        let temp: [number, number][] = tempMirrorLinePoints;
-        // console.log(temp.length);
-        if (temp.length == 0) {
-          setTempMirrorLinePoints([[x, y]]);
-        } else {
-          setMirrorLinePoints([temp[0], [x, y]]);
-          setTempMirrorLinePoints([]);
-          // setTool("select")
-        }
-      } else if (tool == "rotCenter") {
-        setCenterOfRotation([x, y]);
-        // setTool("select")
-      } else if (tool == "vector") {
-        let temp = tempTransVector;
-        if (temp?.length == 0) {
-          setTempTransVector([[x, y]]);
-        }
-         else if(temp){
-          setTransVector([temp[0], [x, y]]);
-          setTempTransVector([]);
-          // setTool("select")
-        }
-      } else if (tool == "select") {
-        if (
-          Object.values(objects)
-            .flat()
-            .some((point) => point.join(",") === `${x},${y}`)
-        ) {
-          setSelectedObjectPoint([x, y]);
-          console.log("object removed");
-          setSelectedObject("");
-        } else {
-          setSelectedObjectPoint(null);
-          if (selectedObject &&!e.target.closest('.objects-polygons')) {
-            console.log("no polygon");
-            if (
-              selectionCoordinates.x1 > x ||
-              selectionCoordinates.x2 < x ||
-              selectionCoordinates.y1 > y ||
-              selectionCoordinates.y2 < y
-            ) {
-              setSelectedObject("");
+        } else if (tool == "vector") {
+          let temp = tempTransVector;
+          if (temp?.length == 0) {
+            setTempTransVector([[x, y]]);
+          } else if (temp) {
+            setTransVector([temp[0], [x, y]]);
+            setTempTransVector([]);
+            // setTool("select")
+          }
+        } else if (tool == "select") {
+          if (
+            Object.values(objects)
+              .flat()
+              .some((point) => point.join(",") === `${x},${y}`)
+          ) {
+            setSelectedObjectPoint([x, y]);
+            console.log("object removed");
+            setSelectedObject("");
+          } else {
+            setSelectedObjectPoint(null);
+            if (selectedObject && !e.target.closest(".objects-polygons")) {
+              console.log("no polygon");
+              if (
+                selectionCoordinates.x1 > x ||
+                selectionCoordinates.x2 < x ||
+                selectionCoordinates.y1 > y ||
+                selectionCoordinates.y2 < y
+              ) {
+                setSelectedObject("");
+              }
             }
           }
+        } else if (tool == "enlargementCenter") {
+          setCenterOfEnlargement([x, y]);
+          // setTool("select")
+        } else if (tool == "zoomIn" && zoom < 400) {
+          handleZoom2(zoom + 10, e.clientX, e.clientY);
+        } else if (tool == "zoomOut" && zoom > minZoom + 10) {
+          handleZoom2(zoom - 10, e.clientX, e.clientY);
         }
-      } else if (tool == "enlargementCenter") {
-        setCenterOfEnlargement([x, y]);
-        // setTool("select")
-      } else if (tool == "zoomIn" && zoom < 400) {
-        handleZoom2(zoom + 10, e.clientX, e.clientY);
-      } else if (tool == "zoomOut" && zoom > minZoom + 10) {
-        handleZoom2(zoom - 10, e.clientX, e.clientY);
       }
-    }}
+    }
   };
   const handleDelete = () => {
     if (selectedObject) {
@@ -630,33 +701,88 @@ useEffect(()=>{
     if (f == 1) {
       return "Image has same size as object";
     } else if (f == 0) {
-      return "Image is a point at the center of enlargement"
-    }
-    else if(f==-1){
+      return "Image is a point at the center of enlargement";
+    } else if (f == -1) {
       return "Image has same size as the object but it's inverted as the scale factor is negative";
-    }
-     else if (f >1) {
+    } else if (f > 1) {
       return "Image is bigger than the object as magnitude of the scale factor is greater than 1";
-    }
-    else if (f >0) {
+    } else if (f > 0) {
       return "Image is smaller than the object as magnitude of the scale factor is less than 1";
-    }
-    else if(f>-1){
+    } else if (f > -1) {
       return "Image is smaller than the object as the scale factor has a magnitude less than 1. And it's inverted as the scale factor is negative";
-    }
-    else{
+    } else {
       return "Image is bigger than the object as the scale factor has a magnitude greater than 1. And it's inverted as the scale factor is negative";
     }
-  }
-  const coordPos=([x1,y1]:[number,number],[x2,y2]:[number,number])=>{
-    if(x1===x2&&y1===y2){
-      return [percentX(x1+1),percentY(y1+1)]
+  };
+  const coordPos = ([x1, y1]: [number, number], [x2, y2]: [number, number]) => {
+    if (x1 === x2 && y1 === y2) {
+      return [percentX(x1 + 1), percentY(y1 + 1)];
     }
-    let coords=[percentX(x1+(x1-x2)/Math.sqrt((x1-x2)**2+(y1-y2)**2)),percentY(y1+(y1-y2)/Math.sqrt((x1-x2)**2+(y1-y2)**2))]
+    let coords = [
+      percentX(x1 + (x1 - x2) / Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)),
+      percentY(y1 + (y1 - y2) / Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)),
+    ];
     console.log(coords);
-    return coords
-  }
-
+    return coords;
+  };
+  // const handleDragObjectStart = (e: any, key: string) => {
+  //   console.log("drag start", key);
+    
+  //   e = e.touches?.[0] || e;
+  //   if (graphBox.current && selectedObject) {
+  //     let rect = graphBox.current.getBoundingClientRect();
+  //     let x =
+  //       Math.round(
+  //         ((e.clientX - rect.x) * (x2 - x1)) /
+  //           (((x2 - x1) * zoomFactor * zoom) / 100)
+  //       ) + x1;
+  //     let y =
+  //       Math.round(
+  //         ((e.clientY - rect.height - rect.y) * (y1 - y2)) /
+  //           (((y2 - y1) * zoomFactor * zoom) / 100)
+  //       ) + y1;
+  //     if (x > x1 && x < x2 && y > y1 && y < y2) {
+  //       setDragStart([x, y]);
+  //       setDraggingObject(key);
+  //     } else {
+  //       setDragStart(null);
+  //       setDraggingObject("");
+  //     }
+  //   }
+  // };
+  // const handleDragObject = (e: any, key: string) => {
+  //   if (graphBox.current&&selectedObject) {
+  //     e = e.touches?.[0] || e;
+  //     let tempObjects:objectsState = objects;
+  //     let rect = graphBox.current.getBoundingClientRect();
+  //     let x: number =
+  //       Math.round(
+  //         ((e.clientX - rect.x) * (x2 - x1)) /
+  //           (((x2 - x1) * zoomFactor * zoom) / 100)
+  //       ) + x1;
+  //     let y : number =
+  //       Math.round(
+  //         ((e.clientY - rect.height - rect.y) * (y1 - y2)) /
+  //           (((y2 - y1) * zoomFactor * zoom) / 100)
+  //       ) + y1;    
+  //     if (x > x1 && x < x2 && y > y1 && y < y2) {
+  //       if (dragStart&&draggingObject===key&&draggingObject!=="") {
+  //         tempObjects[selectedObject] = tempObjects[selectedObject].map(
+  //           (point): [number, number] => [point[0]+x-dragStart[0],point[1]+y-dragStart[1]]
+  //         );
+  //         setObjects({ ...tempObjects });
+  //       }
+  //     } else {
+  //       setHoveredPoint(null);
+  //     }
+  //   }
+  // };
+  // const handleDragEnd = () => {
+  //   setDragStart(null);
+  //   setDraggingObject("");
+  //   setDraggingPoint(null) 
+  //   setDraggingSpecialPoint("")
+  // }
   return (
     <>
       <div
@@ -700,7 +826,7 @@ useEffect(()=>{
             </button>
             <button
               type="button"
-              onClick={()=>setShowDeletePrompt(true)}
+              onClick={() => setShowDeletePrompt(true)}
               className={`m-1 bg-[${color1}] text-white p-1 px-2 rounded`}
               title="Delete all objects"
             >
@@ -709,11 +835,13 @@ useEffect(()=>{
             <hr className="w-full" />
             <button
               type="button"
-              onClick={() =>setShowCoords(!showCoords)}
+              onClick={() => setShowCoords(!showCoords)}
               className={`m-1 bg-[${
                 showCoords ? color2 : color1
-              }] text-white p-1 px-0.5 rounded ${(!showCoords) &&'crossed'}`}
-              title={`${showCoords ? "Hide" : "Show"} coordinates of selected vertex`}
+              }] text-white p-1 px-0.5 rounded ${!showCoords && "crossed"}`}
+              title={`${
+                showCoords ? "Hide" : "Show"
+              } coordinates of selected vertex`}
             >
               (x,y)
             </button>
@@ -765,7 +893,9 @@ useEffect(()=>{
                 >
                   <i className="fa-solid fa-slash"></i>
                 </button>
-                <p className={`mx-1 p-1 bg-white rounded border border-2 border-[${color1}]`}>
+                <p
+                  className={`mx-1 p-1 bg-white rounded border border-2 border-[${color1}]`}
+                >
                   Reflection on the line{" "}
                   <span className="font-bold text-[#800080]">
                     {lineEquation(mirrorLinePoints)}
@@ -777,9 +907,7 @@ useEffect(()=>{
             {transformation == "rotation" && (
               <>
                 <div className="flex flex-col items-center relative">
-                <span
-                    className="absolute top-2 left-1 z-10 origin-[0] -translate-y-4 scale-75 transform cursor-text select-none bg-white px-2 text-sm text-gray-500 duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:px-2 peer-focus:text-blue-600"
-                  >
+                  <span className="absolute top-2 left-1 z-10 origin-[0] -translate-y-4 scale-75 transform cursor-text select-none bg-white px-2 text-sm text-gray-500 duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:px-2 peer-focus:text-blue-600">
                     Direction
                   </span>
                   <div className="flex items-center justify-center mt-2 z-10">
@@ -793,7 +921,7 @@ useEffect(()=>{
                     >
                       <i className="fa-solid fa-rotate-left fa-xs"></i>
                     </button>
-    
+
                     <button
                       type="button"
                       onClick={() => setIsClockwise(true)}
@@ -833,9 +961,13 @@ useEffect(()=>{
                   <input
                     type="number"
                     onChange={(e) => {
-                      if(Number(e.target.value)>360){setRotationAngle(360);}
-                      else if(Number(e.target.value)<0){setRotationAngle(0);}
-                      else{setRotationAngle(Number(e.target.value));}
+                      if (Number(e.target.value) > 360) {
+                        setRotationAngle(360);
+                      } else if (Number(e.target.value) < 0) {
+                        setRotationAngle(0);
+                      } else {
+                        setRotationAngle(Number(e.target.value));
+                      }
                       setTool("select");
                     }}
                     value={rotationAngle}
@@ -845,9 +977,7 @@ useEffect(()=>{
                     className={`peer block w-15 p-1 bg-white rounded border border-2 border-[${color1}] focus:border-[${color2}] w-16 text-center`}
                     placeholder=" "
                   />
-                  <label
-                    className="absolute top-2 left-1 z-10 origin-[0] -translate-y-4 scale-75 transform cursor-text select-none bg-white px-2 text-sm text-gray-500 duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:px-2 peer-focus:text-blue-600"
-                  >
+                  <label className="absolute top-2 left-1 z-10 origin-[0] -translate-y-4 scale-75 transform cursor-text select-none bg-white px-2 text-sm text-gray-500 duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:px-2 peer-focus:text-blue-600">
                     {" "}
                     Rotation angle (deg){" "}
                   </label>
@@ -926,9 +1056,11 @@ useEffect(()=>{
                     <input
                       type="range"
                       onChange={(e) => {
-                        if(Number(e.target.value)<-10){setEnlargementFactor(-10);}
-                        else if(Number(e.target.value)>10){setEnlargementFactor(10);}
-                        else{
+                        if (Number(e.target.value) < -10) {
+                          setEnlargementFactor(-10);
+                        } else if (Number(e.target.value) > 10) {
+                          setEnlargementFactor(10);
+                        } else {
                           setEnlargementFactor(Number(e.target.value));
                         }
                         setTool("select");
@@ -1041,6 +1173,8 @@ useEffect(()=>{
             onTouchEnd={(e) => {
               handleClick(e);
             }}
+            // onMouseUp={handleDragEnd}
+            // onMouseLeave={handleDragEnd}
             // onTouchEnd={(e) => {
             //   handleClick(e);
             // }}
@@ -1090,21 +1224,20 @@ useEffect(()=>{
                   strokeWidth="1"
                 />
               </marker>
-              
-              
-              
             </defs>
             {(tool == "mirror" ||
               tool == "polygon" ||
               tool == "rotCenter" ||
               tool == "vector" ||
               tool == "enlargementCenter") &&
-              hoveredPoint&&renderRipple(
+              hoveredPoint &&
+              renderRipple(
                 percentX(hoveredPoint[0]),
                 percentY(hoveredPoint[1])
               )}
             {tool == "select" &&
-              hoveredObjectPoint&&renderRipple(
+              hoveredObjectPoint &&
+              renderRipple(
                 percentX(hoveredObjectPoint[0]),
                 percentY(hoveredObjectPoint[1])
               )}
@@ -1123,7 +1256,7 @@ useEffect(()=>{
                   fill="none"
                   strokeWidth={10 / zoom}
                 ></polyline>
-                {tempObjectPoints.length > 0 &&hoveredPoint&& (
+                {tempObjectPoints.length > 0 && hoveredPoint && (
                   <line
                     name="object-temp-last-line"
                     x1={percentX(
@@ -1152,11 +1285,11 @@ useEffect(()=>{
               </>
             )}
 
-
             {/* reflection */}
             {transformation == "reflection" && (
               <>
-                {tempMirrorLinePoints.length == 1 &&hoveredPoint&&
+                {tempMirrorLinePoints.length == 1 &&
+                  hoveredPoint &&
                   renderLine(
                     percentX(tempMirrorLinePoints[0][0]),
                     percentY(tempMirrorLinePoints[0][1]),
@@ -1184,7 +1317,7 @@ useEffect(()=>{
                     10 / zoom,
                     `${30 / zoom} ${15 / zoom}`
                   )}
-                {tempMirrorLinePoints.length == 1 && hoveredPoint&&(
+                {tempMirrorLinePoints.length == 1 && hoveredPoint && (
                   <>
                     <circle
                       name="temp-mirror-point-1"
@@ -1253,7 +1386,7 @@ useEffect(()=>{
             {transformation == "translation" && (
               <>
                 {transVector.length > 1 && (
-                 <>
+                  <>
                     <line
                       name="trans-vector"
                       x1={percentX(transVector[0][0])}
@@ -1266,26 +1399,72 @@ useEffect(()=>{
                       markerEnd="url(#vector-arrow)"
                     />
                     <line
-                    name="trans-vector-X"
-                    x1={percentX(transVector[0][0])}
-                    y1={percentY(transVector[0][1])}
-                    x2={percentX(transVector[1][0])}
-                    y2={percentY(transVector[0][1])}
-                    stroke="purple"
-                    opacity={0.3}
-                    strokeWidth={10 / zoom}
-                    strokeDasharray="none"
-                    markerEnd="url(#vector-arrow)"
-                  />
-                  <g id="trans-vector-x-label">
-                    <rect x={percentX((transVector[0][0]+transVector[1][0])/2)} y={percentY(transVector[0][1])} width={80/zoom} height={80/zoom} fill="white" opacity={0.8} transform={`translate(${-40/zoom} ${-40/zoom})`} rx={30/zoom} ry={30/zoom}/>
-                    <text x={percentX((transVector[0][0]+transVector[1][0])/2)} y={percentY(transVector[0][1])} fill="purple" fontSize={40/zoom} textAnchor="middle" alignmentBaseline="middle">{(transVector[1][0]-transVector[0][0])}</text>
-                  </g>
-                  <g id="trans-vector-y-label">
-                    <rect x={percentX(transVector[1][0])} y={percentY((transVector[0][1]+transVector[1][1])/2)} width={80/zoom} height={80/zoom} fill="white" opacity={0.8} transform={`translate(${-40/zoom} ${-40/zoom})`} rx={30/zoom} ry={30/zoom}/>
-                    <text  x={percentX(transVector[1][0])} y={percentY((transVector[0][1]+transVector[1][1])/2)} fill="purple" fontSize={40/zoom} textAnchor="middle" alignmentBaseline="middle">{Math.abs(transVector[1][1]-transVector[0][1])}</text>
+                      name="trans-vector-X"
+                      x1={percentX(transVector[0][0])}
+                      y1={percentY(transVector[0][1])}
+                      x2={percentX(transVector[1][0])}
+                      y2={percentY(transVector[0][1])}
+                      stroke="purple"
+                      opacity={0.3}
+                      strokeWidth={10 / zoom}
+                      strokeDasharray="none"
+                      markerEnd="url(#vector-arrow)"
+                    />
+                    <g id="trans-vector-x-label">
+                      <rect
+                        x={percentX(
+                          (transVector[0][0] + transVector[1][0]) / 2
+                        )}
+                        y={percentY(transVector[0][1])}
+                        width={80 / zoom}
+                        height={80 / zoom}
+                        fill="white"
+                        opacity={0.8}
+                        transform={`translate(${-40 / zoom} ${-40 / zoom})`}
+                        rx={30 / zoom}
+                        ry={30 / zoom}
+                      />
+                      <text
+                        x={percentX(
+                          (transVector[0][0] + transVector[1][0]) / 2
+                        )}
+                        y={percentY(transVector[0][1])}
+                        fill="purple"
+                        fontSize={40 / zoom}
+                        textAnchor="middle"
+                        alignmentBaseline="middle"
+                      >
+                        {transVector[1][0] - transVector[0][0]}
+                      </text>
                     </g>
-                   <line
+                    <g id="trans-vector-y-label">
+                      <rect
+                        x={percentX(transVector[1][0])}
+                        y={percentY(
+                          (transVector[0][1] + transVector[1][1]) / 2
+                        )}
+                        width={80 / zoom}
+                        height={80 / zoom}
+                        fill="white"
+                        opacity={0.8}
+                        transform={`translate(${-40 / zoom} ${-40 / zoom})`}
+                        rx={30 / zoom}
+                        ry={30 / zoom}
+                      />
+                      <text
+                        x={percentX(transVector[1][0])}
+                        y={percentY(
+                          (transVector[0][1] + transVector[1][1]) / 2
+                        )}
+                        fill="purple"
+                        fontSize={40 / zoom}
+                        textAnchor="middle"
+                        alignmentBaseline="middle"
+                      >
+                        {Math.abs(transVector[1][1] - transVector[0][1])}
+                      </text>
+                    </g>
+                    <line
                       name="trans-vector-y"
                       x1={percentX(transVector[1][0])}
                       y1={percentY(transVector[0][1])}
@@ -1297,8 +1476,7 @@ useEffect(()=>{
                       strokeDasharray="none"
                       markerEnd="url(#vector-arrow)"
                     />
-
-                 </>
+                  </>
                 )}
 
                 {tempTransVector?.length == 1 && (
@@ -1310,25 +1488,27 @@ useEffect(()=>{
                       r={25 / zoom}
                       fill="purple"
                     />
-                    {hoveredPoint&&<>
-                      <circle
-                        name="temp-trans-vector-point-2"
-                        cx={percentX(hoveredPoint[0])}
-                        cy={percentY(hoveredPoint[1])}
-                        r={25 / zoom}
-                        fill="purple"
-                      />
-                      <line
-                        name="temp-trans-vector"
-                        x1={percentX(tempTransVector[0][0])}
-                        y1={percentY(tempTransVector[0][1])}
-                        x2={percentX(hoveredPoint[0])}
-                        y2={percentY(hoveredPoint[1])}
-                        stroke={color2}
-                        strokeWidth={10 / zoom}
-                        strokeDasharray={`${10 / zoom} ${10 / zoom}`}
-                      />
-                    </>}
+                    {hoveredPoint && (
+                      <>
+                        <circle
+                          name="temp-trans-vector-point-2"
+                          cx={percentX(hoveredPoint[0])}
+                          cy={percentY(hoveredPoint[1])}
+                          r={25 / zoom}
+                          fill="purple"
+                        />
+                        <line
+                          name="temp-trans-vector"
+                          x1={percentX(tempTransVector[0][0])}
+                          y1={percentY(tempTransVector[0][1])}
+                          x2={percentX(hoveredPoint[0])}
+                          y2={percentY(hoveredPoint[1])}
+                          stroke={color2}
+                          strokeWidth={10 / zoom}
+                          strokeDasharray={`${10 / zoom} ${10 / zoom}`}
+                        />
+                      </>
+                    )}
                   </>
                 )}
 
@@ -1378,13 +1558,15 @@ useEffect(()=>{
                 ))}
               </>
             )}
-                        {/* objects */}
+            {/* objects */}
             {Object.keys(objects).map((key) => (
               <>
                 <polygon
                   key={`object-${key}`}
                   name="objects"
-                  className="objects-polygons"
+                  className={`objects-polygons ${
+                    key == selectedObject ? "cursor-move" : ""
+                  }`}
                   points={objects?.[key]
                     ?.map(
                       (coord) => `${percentX(coord[0])},${percentY(coord[1])}`
@@ -1398,6 +1580,8 @@ useEffect(()=>{
                     tool == "select" && setSelectedObject(key);
                     // console.log("object selected");
                   }}
+                  // onMouseDown={(e) => handleDragObjectStart(e, key)}
+                  // onMouseMove={(e) => handleDragObject(e, key)}
                 ></polygon>
               </>
             ))}
@@ -1449,7 +1633,8 @@ useEffect(()=>{
               </g>
             )}
             {/* point selection */}
-            {selectedObjectPoint&&selectedObjectPoint.length > 0 &&
+            {selectedObjectPoint &&
+              selectedObjectPoint.length > 0 &&
               transformation == "reflection" && (
                 <g>
                   <circle
@@ -1486,104 +1671,139 @@ useEffect(()=>{
                   />
                   {showCoords && (
                     <>
-                    <text
-                      name="selected-coordinates"
-                      x={coordPos(selectedObjectPoint,reflect(selectedObjectPoint, mirrorLinePoints))[0]}
-                        y={coordPos(selectedObjectPoint,reflect(selectedObjectPoint, mirrorLinePoints))[1]}
-                      fill={'grey'}
-                      fontSize={80 / zoom}
-                      textAnchor="middle"
-                      dominantBaseline="middle"
-                      className="text-outline"
-                    >
-                      {`(${Math.round(selectedObjectPoint[0]*10)/10},${Math.round(selectedObjectPoint[1]*10)/10})`}
-                    </text>
                       <text
-                        name="reflection-coordinates"
-                        x={coordPos(reflect(selectedObjectPoint, mirrorLinePoints),selectedObjectPoint)[0]}
-                        y={coordPos(reflect(selectedObjectPoint, mirrorLinePoints),selectedObjectPoint)[1]}
-                        fill={'grey'}
+                        name="selected-coordinates"
+                        x={
+                          coordPos(
+                            selectedObjectPoint,
+                            reflect(selectedObjectPoint, mirrorLinePoints)
+                          )[0]
+                        }
+                        y={
+                          coordPos(
+                            selectedObjectPoint,
+                            reflect(selectedObjectPoint, mirrorLinePoints)
+                          )[1]
+                        }
+                        fill={"grey"}
                         fontSize={80 / zoom}
                         textAnchor="middle"
                         dominantBaseline="middle"
                         className="text-outline"
                       >
-                        {`(${Math.round(reflect(selectedObjectPoint, mirrorLinePoints)[0]*10)/10},${Math.round(reflect(selectedObjectPoint, mirrorLinePoints)[1]*10)/10})`}
+                        {`(${Math.round(selectedObjectPoint[0] * 10) / 10},${
+                          Math.round(selectedObjectPoint[1] * 10) / 10
+                        })`}
+                      </text>
+                      <text
+                        name="reflection-coordinates"
+                        x={
+                          coordPos(
+                            reflect(selectedObjectPoint, mirrorLinePoints),
+                            selectedObjectPoint
+                          )[0]
+                        }
+                        y={
+                          coordPos(
+                            reflect(selectedObjectPoint, mirrorLinePoints),
+                            selectedObjectPoint
+                          )[1]
+                        }
+                        fill={"grey"}
+                        fontSize={80 / zoom}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        className="text-outline"
+                      >
+                        {`(${
+                          Math.round(
+                            reflect(selectedObjectPoint, mirrorLinePoints)[0] *
+                              10
+                          ) / 10
+                        },${
+                          Math.round(
+                            reflect(selectedObjectPoint, mirrorLinePoints)[1] *
+                              10
+                          ) / 10
+                        })`}
                       </text>
                     </>
                   )}
                 </g>
               )}
-            {selectedObjectPoint&&selectedObjectPoint.length > 0 && transformation == "rotation" &&centerOfRotation&& (
-              <g>
-                <circle
-                  name="selected-object-point"
-                  cx={percentX(selectedObjectPoint[0])}
-                  cy={percentY(selectedObjectPoint[1])}
-                  r={25 / zoom}
-                  fill={color1}
-                />
-                <circle
-                  name="rotated-object-point"
-                  cx={percentX(
-                    rotate(
-                      selectedObjectPoint,
-                      centerOfRotation,
-                      rotationAngle,
-                      isClockwise
-                    )[0]
-                  )}
-                  cy={percentY(
-                    rotate(
-                      selectedObjectPoint,
-                      centerOfRotation,
-                      rotationAngle,
-                      isClockwise
-                    )[1]
-                  )}
-                  r={25 / zoom}
-                  fill={color2}
-                />
-                <line
-                  name="rotation-line-1"
-                  x1={percentX(selectedObjectPoint[0])}
-                  y1={percentY(selectedObjectPoint[1])}
-                  x2={percentX(centerOfRotation[0])}
-                  y2={percentY(centerOfRotation[1])}
-                  stroke="grey"
-                  strokeWidth={10 / zoom}
-                  strokeDasharray="none"
-                />
-                <line
-                  name="rotation-line-2"
-                  x1={percentX(
-                    rotate(
-                      selectedObjectPoint,
-                      centerOfRotation,
-                      rotationAngle,
-                      isClockwise
-                    )[0]
-                  )}
-                  y1={percentY(
-                    rotate(
-                      selectedObjectPoint,
-                      centerOfRotation,
-                      rotationAngle,
-                      isClockwise
-                    )[1]
-                  )}
-                  x2={percentX(centerOfRotation[0])}
-                  y2={percentY(centerOfRotation[1])}
-                  stroke="grey"
-                  strokeWidth={10 / zoom}
-                  strokeDasharray="none"
-                />
-                <path
-                  name="roation-arc"
-                  id="arc"
-                  d={`M${percentX(
-                    (selectedObjectPoint[0] + 2 * centerOfRotation[0]) / 3
-                  )}
+            {selectedObjectPoint &&
+              selectedObjectPoint.length > 0 &&
+              transformation == "rotation" &&
+              centerOfRotation && (
+                <g>
+                  <circle
+                    name="selected-object-point"
+                    cx={percentX(selectedObjectPoint[0])}
+                    cy={percentY(selectedObjectPoint[1])}
+                    r={25 / zoom}
+                    fill={color1}
+                  />
+                  <circle
+                    name="rotated-object-point"
+                    cx={percentX(
+                      rotate(
+                        selectedObjectPoint,
+                        centerOfRotation,
+                        rotationAngle,
+                        isClockwise
+                      )[0]
+                    )}
+                    cy={percentY(
+                      rotate(
+                        selectedObjectPoint,
+                        centerOfRotation,
+                        rotationAngle,
+                        isClockwise
+                      )[1]
+                    )}
+                    r={25 / zoom}
+                    fill={color2}
+                  />
+                  <line
+                    name="rotation-line-1"
+                    x1={percentX(selectedObjectPoint[0])}
+                    y1={percentY(selectedObjectPoint[1])}
+                    x2={percentX(centerOfRotation[0])}
+                    y2={percentY(centerOfRotation[1])}
+                    stroke="grey"
+                    strokeWidth={10 / zoom}
+                    strokeDasharray="none"
+                  />
+                  <line
+                    name="rotation-line-2"
+                    x1={percentX(
+                      rotate(
+                        selectedObjectPoint,
+                        centerOfRotation,
+                        rotationAngle,
+                        isClockwise
+                      )[0]
+                    )}
+                    y1={percentY(
+                      rotate(
+                        selectedObjectPoint,
+                        centerOfRotation,
+                        rotationAngle,
+                        isClockwise
+                      )[1]
+                    )}
+                    x2={percentX(centerOfRotation[0])}
+                    y2={percentY(centerOfRotation[1])}
+                    stroke="grey"
+                    strokeWidth={10 / zoom}
+                    strokeDasharray="none"
+                  />
+                  <path
+                    name="roation-arc"
+                    id="arc"
+                    d={`M${percentX(
+                      (selectedObjectPoint[0] + 2 * centerOfRotation[0]) / 3
+                    )}
                ${percentY(
                  (selectedObjectPoint[1] + 2 * centerOfRotation[1]) / 3
                )} 
@@ -1628,70 +1848,193 @@ useEffect(()=>{
                     2 * centerOfRotation[1]) /
                     3
                 )}`}
-                  stroke="grey"
-                  strokeWidth={10 / zoom}
-                  strokeDasharray="none"
-                  fill="none"
-                  markerEnd={
-                    (rotationAngle > 0 && rotationAngle < 360) ? "url(#arrow)" : ""
-                  }
-                  
-                />
-                {rotationAngle == 360 && (
-                  <circle
-                    name="full-rotation-circle"
-                    cx={percentX(centerOfRotation[0])}
-                    cy={percentY(centerOfRotation[1])}
-                    r={
-                      Math.sqrt(
-                        (percentX(selectedObjectPoint[0]) -
-                          percentX(centerOfRotation[0])) **
-                          2 +
-                          (percentY(selectedObjectPoint[1]) -
-                            percentY(centerOfRotation[1])) **
-                            2
-                      ) / 3
-                    }
-                    fill="none"
                     stroke="grey"
                     strokeWidth={10 / zoom}
+                    strokeDasharray="none"
+                    fill="none"
+                    markerEnd={
+                      rotationAngle > 0 && rotationAngle < 360
+                        ? "url(#arrow)"
+                        : ""
+                    }
                   />
-                )}
-                <g id="angle-label">
-                <rect x={percentX((rotate(selectedObjectPoint,centerOfRotation,rotationAngle/2, isClockwise)[0]+(2 * centerOfRotation[0])) / 3)-60/zoom} y={percentY((rotate(selectedObjectPoint,centerOfRotation,rotationAngle/2, isClockwise)[1]+(2 * centerOfRotation[1])) / 3)-40/zoom} width={120/zoom} height={80/zoom} fill="white" opacity={0.6} rx={50/zoom} ry={50/zoom} />
-    <text x={percentX((rotate(selectedObjectPoint,centerOfRotation,rotationAngle/2, isClockwise)[0]+(2 * centerOfRotation[0])) / 3)} y={percentY((rotate(selectedObjectPoint,centerOfRotation,rotationAngle/2, isClockwise)[1]+(2 * centerOfRotation[1])) / 3)} fill="black" dominant-baseline="middle" alignmentBaseline="middle" text-anchor="middle" fontSize={40 / zoom}>{rotationAngle}°</text>
-  </g>
-                {showCoords && (
-                    <>
+                  {rotationAngle == 360 && (
+                    <circle
+                      name="full-rotation-circle"
+                      cx={percentX(centerOfRotation[0])}
+                      cy={percentY(centerOfRotation[1])}
+                      r={
+                        Math.sqrt(
+                          (percentX(selectedObjectPoint[0]) -
+                            percentX(centerOfRotation[0])) **
+                            2 +
+                            (percentY(selectedObjectPoint[1]) -
+                              percentY(centerOfRotation[1])) **
+                              2
+                        ) / 3
+                      }
+                      fill="none"
+                      stroke="grey"
+                      strokeWidth={10 / zoom}
+                    />
+                  )}
+                  <g id="angle-label">
+                    <rect
+                      x={
+                        percentX(
+                          (rotate(
+                            selectedObjectPoint,
+                            centerOfRotation,
+                            rotationAngle / 2,
+                            isClockwise
+                          )[0] +
+                            2 * centerOfRotation[0]) /
+                            3
+                        ) -
+                        60 / zoom
+                      }
+                      y={
+                        percentY(
+                          (rotate(
+                            selectedObjectPoint,
+                            centerOfRotation,
+                            rotationAngle / 2,
+                            isClockwise
+                          )[1] +
+                            2 * centerOfRotation[1]) /
+                            3
+                        ) -
+                        40 / zoom
+                      }
+                      width={120 / zoom}
+                      height={80 / zoom}
+                      fill="white"
+                      opacity={0.6}
+                      rx={50 / zoom}
+                      ry={50 / zoom}
+                    />
                     <text
-                      name="selected-coordinates"
-                      x={coordPos(selectedObjectPoint,rotate(selectedObjectPoint, centerOfRotation, rotationAngle, isClockwise))[0]}
-                        y={coordPos(selectedObjectPoint,rotate(selectedObjectPoint, centerOfRotation, rotationAngle, isClockwise))[1]}
-                      fill={'grey'}
-                      fontSize={80 / zoom}
-                      textAnchor="middle"
-                      dominantBaseline="middle"
-                      className="text-outline"
+                      x={percentX(
+                        (rotate(
+                          selectedObjectPoint,
+                          centerOfRotation,
+                          rotationAngle / 2,
+                          isClockwise
+                        )[0] +
+                          2 * centerOfRotation[0]) /
+                          3
+                      )}
+                      y={percentY(
+                        (rotate(
+                          selectedObjectPoint,
+                          centerOfRotation,
+                          rotationAngle / 2,
+                          isClockwise
+                        )[1] +
+                          2 * centerOfRotation[1]) /
+                          3
+                      )}
+                      fill="black"
+                      dominant-baseline="middle"
+                      alignmentBaseline="middle"
+                      text-anchor="middle"
+                      fontSize={40 / zoom}
                     >
-                      {`(${Math.round(selectedObjectPoint[0]*10)/10},${Math.round(selectedObjectPoint[1]*10)/10})`}
+                      {rotationAngle}°
                     </text>
+                  </g>
+                  {showCoords && (
+                    <>
                       <text
-                        name="rottated-coordinates"
-                        x={coordPos(rotate(selectedObjectPoint, centerOfRotation, rotationAngle, isClockwise),selectedObjectPoint)[0]}
-                        y={coordPos(rotate(selectedObjectPoint, centerOfRotation, rotationAngle, isClockwise),selectedObjectPoint)[1]}
-                        fill={'grey'}
+                        name="selected-coordinates"
+                        x={
+                          coordPos(
+                            selectedObjectPoint,
+                            rotate(
+                              selectedObjectPoint,
+                              centerOfRotation,
+                              rotationAngle,
+                              isClockwise
+                            )
+                          )[0]
+                        }
+                        y={
+                          coordPos(
+                            selectedObjectPoint,
+                            rotate(
+                              selectedObjectPoint,
+                              centerOfRotation,
+                              rotationAngle,
+                              isClockwise
+                            )
+                          )[1]
+                        }
+                        fill={"grey"}
                         fontSize={80 / zoom}
                         textAnchor="middle"
                         dominantBaseline="middle"
                         className="text-outline"
                       >
-                        {`(${Math.round(rotate(selectedObjectPoint, centerOfRotation, rotationAngle, isClockwise)[0]*10)/10},${Math.round(rotate(selectedObjectPoint, centerOfRotation, rotationAngle, isClockwise)[1]*10)/10})`}
+                        {`(${Math.round(selectedObjectPoint[0] * 10) / 10},${
+                          Math.round(selectedObjectPoint[1] * 10) / 10
+                        })`}
+                      </text>
+                      <text
+                        name="rottated-coordinates"
+                        x={
+                          coordPos(
+                            rotate(
+                              selectedObjectPoint,
+                              centerOfRotation,
+                              rotationAngle,
+                              isClockwise
+                            ),
+                            selectedObjectPoint
+                          )[0]
+                        }
+                        y={
+                          coordPos(
+                            rotate(
+                              selectedObjectPoint,
+                              centerOfRotation,
+                              rotationAngle,
+                              isClockwise
+                            ),
+                            selectedObjectPoint
+                          )[1]
+                        }
+                        fill={"grey"}
+                        fontSize={80 / zoom}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        className="text-outline"
+                      >
+                        {`(${
+                          Math.round(
+                            rotate(
+                              selectedObjectPoint,
+                              centerOfRotation,
+                              rotationAngle,
+                              isClockwise
+                            )[0] * 10
+                          ) / 10
+                        },${
+                          Math.round(
+                            rotate(
+                              selectedObjectPoint,
+                              centerOfRotation,
+                              rotationAngle,
+                              isClockwise
+                            )[1] * 10
+                          ) / 10
+                        })`}
                       </text>
                     </>
                   )}
-              </g>
-            )}
-            {selectedObjectPoint&&selectedObjectPoint.length > 0 &&
+                </g>
+              )}
+            {selectedObjectPoint &&
+              selectedObjectPoint.length > 0 &&
               transformation == "translation" && (
                 <>
                   <circle
@@ -1760,46 +2103,133 @@ useEffect(()=>{
                     markerEnd="url(#arrow)"
                   />
                   <g id="trans-line-x-label">
-                    <rect x={percentX((selectedObjectPoint[0]+translate(selectedObjectPoint, transVector)[0])/2)} y={percentY(selectedObjectPoint[1])} width={80/zoom} height={80/zoom} fill="white" opacity={0.8} transform={`translate(${-40/zoom} ${-40/zoom})`} rx={30/zoom} ry={30/zoom}/>
-                    <text x={percentX((selectedObjectPoint[0]+translate(selectedObjectPoint, transVector)[0])/2)} y={percentY(selectedObjectPoint[1])} fill="darkslategray" fontSize={40/zoom} textAnchor="middle" alignmentBaseline="middle">{(transVector[1][0]-transVector[0][0])}</text>
+                    <rect
+                      x={percentX(
+                        (selectedObjectPoint[0] +
+                          translate(selectedObjectPoint, transVector)[0]) /
+                          2
+                      )}
+                      y={percentY(selectedObjectPoint[1])}
+                      width={80 / zoom}
+                      height={80 / zoom}
+                      fill="white"
+                      opacity={0.8}
+                      transform={`translate(${-40 / zoom} ${-40 / zoom})`}
+                      rx={30 / zoom}
+                      ry={30 / zoom}
+                    />
+                    <text
+                      x={percentX(
+                        (selectedObjectPoint[0] +
+                          translate(selectedObjectPoint, transVector)[0]) /
+                          2
+                      )}
+                      y={percentY(selectedObjectPoint[1])}
+                      fill="darkslategray"
+                      fontSize={40 / zoom}
+                      textAnchor="middle"
+                      alignmentBaseline="middle"
+                    >
+                      {transVector[1][0] - transVector[0][0]}
+                    </text>
                   </g>
                   <g id="trans-line-y-label">
-                    <rect x={percentX(translate(selectedObjectPoint, transVector)[0])}
-                     y={percentY((selectedObjectPoint[1]+translate(selectedObjectPoint, transVector)[1])/2)} width={80/zoom} height={80/zoom} fill="white" opacity={0.8} transform={`translate(${-40/zoom} ${-40/zoom})`} rx={30/zoom} ry={30/zoom} />
-                    <text  x={percentX(translate(selectedObjectPoint, transVector)[0])}
-                     y={percentY((selectedObjectPoint[1]+translate(selectedObjectPoint, transVector)[1])/2)} fill="darkslategray" fontSize={40/zoom} textAnchor="middle" alignmentBaseline="middle">{Math.abs(transVector[1][1]-transVector[0][1])}</text>
-                    </g>
+                    <rect
+                      x={percentX(
+                        translate(selectedObjectPoint, transVector)[0]
+                      )}
+                      y={percentY(
+                        (selectedObjectPoint[1] +
+                          translate(selectedObjectPoint, transVector)[1]) /
+                          2
+                      )}
+                      width={80 / zoom}
+                      height={80 / zoom}
+                      fill="white"
+                      opacity={0.8}
+                      transform={`translate(${-40 / zoom} ${-40 / zoom})`}
+                      rx={30 / zoom}
+                      ry={30 / zoom}
+                    />
+                    <text
+                      x={percentX(
+                        translate(selectedObjectPoint, transVector)[0]
+                      )}
+                      y={percentY(
+                        (selectedObjectPoint[1] +
+                          translate(selectedObjectPoint, transVector)[1]) /
+                          2
+                      )}
+                      fill="darkslategray"
+                      fontSize={40 / zoom}
+                      textAnchor="middle"
+                      alignmentBaseline="middle"
+                    >
+                      {Math.abs(transVector[1][1] - transVector[0][1])}
+                    </text>
+                  </g>
                   {showCoords && (
                     <>
-                    <text
-                      name="selected-coordinates"
-                      x={coordPos(selectedObjectPoint,translate(selectedObjectPoint, transVector))[0]}
-                        y={coordPos(selectedObjectPoint,translate(selectedObjectPoint, transVector))[1]}
-                      fill={'grey'}
-                      fontSize={80 / zoom}
-                      textAnchor="middle"
-                      dominantBaseline="middle"
-                      className="text-outline"
-                    >
-                      {`(${Math.round(selectedObjectPoint[0]*10)/10},${Math.round(selectedObjectPoint[1]*10)/10})`}
-                    </text>
                       <text
-                        name="translated-coordinates"
-                        x={coordPos(translate(selectedObjectPoint, transVector),selectedObjectPoint)[0]}
-                        y={coordPos(translate(selectedObjectPoint, transVector),selectedObjectPoint)[1]}
-                        fill={'grey'}
+                        name="selected-coordinates"
+                        x={
+                          coordPos(
+                            selectedObjectPoint,
+                            translate(selectedObjectPoint, transVector)
+                          )[0]
+                        }
+                        y={
+                          coordPos(
+                            selectedObjectPoint,
+                            translate(selectedObjectPoint, transVector)
+                          )[1]
+                        }
+                        fill={"grey"}
                         fontSize={80 / zoom}
                         textAnchor="middle"
                         dominantBaseline="middle"
                         className="text-outline"
                       >
-                        {`(${Math.round(translate(selectedObjectPoint, transVector)[0]*10)/10},${Math.round(translate(selectedObjectPoint, transVector)[1]*10)/10})`}
+                        {`(${Math.round(selectedObjectPoint[0] * 10) / 10},${
+                          Math.round(selectedObjectPoint[1] * 10) / 10
+                        })`}
+                      </text>
+                      <text
+                        name="translated-coordinates"
+                        x={
+                          coordPos(
+                            translate(selectedObjectPoint, transVector),
+                            selectedObjectPoint
+                          )[0]
+                        }
+                        y={
+                          coordPos(
+                            translate(selectedObjectPoint, transVector),
+                            selectedObjectPoint
+                          )[1]
+                        }
+                        fill={"grey"}
+                        fontSize={80 / zoom}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        className="text-outline"
+                      >
+                        {`(${
+                          Math.round(
+                            translate(selectedObjectPoint, transVector)[0] * 10
+                          ) / 10
+                        },${
+                          Math.round(
+                            translate(selectedObjectPoint, transVector)[1] * 10
+                          ) / 10
+                        })`}
                       </text>
                     </>
                   )}
                 </>
               )}
-            {selectedObjectPoint&&selectedObjectPoint.length > 0 &&
+            {selectedObjectPoint &&
+              selectedObjectPoint.length > 0 &&
               transformation == "enlargement" && (
                 <>
                   <circle
@@ -1863,29 +2293,83 @@ useEffect(()=>{
                   />
                   {showCoords && (
                     <>
-                    <text
-                      name="selected-coordinates"
-                      x={coordPos(selectedObjectPoint,enlarge(selectedObjectPoint, centerOfEnlargement, enlargementFactor))[0]}
-                        y={coordPos(selectedObjectPoint,enlarge(selectedObjectPoint, centerOfEnlargement, enlargementFactor))[1]}
-                      fill={'grey'}
-                      fontSize={80 / zoom}
-                      textAnchor="middle"
-                      dominantBaseline="middle"
-                      className="text-outline"
-                    >
-                      {`(${Math.round(selectedObjectPoint[0]*10)/10},${Math.round(selectedObjectPoint[1]*10)/10})`}
-                    </text>
                       <text
-                        name="enlarged-coordinates"
-                        x={coordPos(enlarge(selectedObjectPoint, centerOfEnlargement, enlargementFactor),selectedObjectPoint)[0]}
-                        y={coordPos(enlarge(selectedObjectPoint, centerOfEnlargement, enlargementFactor),selectedObjectPoint)[1]}
-                        fill={'grey'}
+                        name="selected-coordinates"
+                        x={
+                          coordPos(
+                            selectedObjectPoint,
+                            enlarge(
+                              selectedObjectPoint,
+                              centerOfEnlargement,
+                              enlargementFactor
+                            )
+                          )[0]
+                        }
+                        y={
+                          coordPos(
+                            selectedObjectPoint,
+                            enlarge(
+                              selectedObjectPoint,
+                              centerOfEnlargement,
+                              enlargementFactor
+                            )
+                          )[1]
+                        }
+                        fill={"grey"}
                         fontSize={80 / zoom}
                         textAnchor="middle"
                         dominantBaseline="middle"
                         className="text-outline"
                       >
-                        {`(${Math.round(enlarge(selectedObjectPoint, centerOfEnlargement, enlargementFactor)[0]*10)/10},${Math.round(enlarge(selectedObjectPoint, centerOfEnlargement, enlargementFactor)[1]*10)/10})`}
+                        {`(${Math.round(selectedObjectPoint[0] * 10) / 10},${
+                          Math.round(selectedObjectPoint[1] * 10) / 10
+                        })`}
+                      </text>
+                      <text
+                        name="enlarged-coordinates"
+                        x={
+                          coordPos(
+                            enlarge(
+                              selectedObjectPoint,
+                              centerOfEnlargement,
+                              enlargementFactor
+                            ),
+                            selectedObjectPoint
+                          )[0]
+                        }
+                        y={
+                          coordPos(
+                            enlarge(
+                              selectedObjectPoint,
+                              centerOfEnlargement,
+                              enlargementFactor
+                            ),
+                            selectedObjectPoint
+                          )[1]
+                        }
+                        fill={"grey"}
+                        fontSize={80 / zoom}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        className="text-outline"
+                      >
+                        {`(${
+                          Math.round(
+                            enlarge(
+                              selectedObjectPoint,
+                              centerOfEnlargement,
+                              enlargementFactor
+                            )[0] * 10
+                          ) / 10
+                        },${
+                          Math.round(
+                            enlarge(
+                              selectedObjectPoint,
+                              centerOfEnlargement,
+                              enlargementFactor
+                            )[1] * 10
+                          ) / 10
+                        })`}
                       </text>
                     </>
                   )}
@@ -1894,7 +2378,7 @@ useEffect(()=>{
           </svg>
         </div>
       </div>
- <>
+      <>
         {showInfo &&
           transformation == "reflection" &&
           info.reflection(() => setShowInfo(false))}
@@ -1907,12 +2391,16 @@ useEffect(()=>{
         {showInfo &&
           transformation == "enlargement" &&
           info.enlargement(() => setShowInfo(false))}
-  {showDeletePrompt&&info.delete(()=>setShowDeletePrompt(false),() => {
-                  setObjects({});
-                  setSelectedObjectPoint(null);
-                  setSelectedObject("");
-                })}
-  
+        {showDeletePrompt &&
+          info.delete(
+            () => setShowDeletePrompt(false),
+            () => {
+              setObjects({});
+              setSelectedObjectPoint(null);
+              setSelectedObject("");
+            }
+          )}
+
         {showHelp1 && (
           <Help
             helpFor={"general"}
@@ -1920,23 +2408,40 @@ useEffect(()=>{
               setShowHelp1(false);
               setShowHelp2(true);
             }}
-            handleClose2={()=>{setShowHelp1(false)}}
+            handleClose2={() => {
+              setShowHelp1(false);
+            }}
           />
         )}
         {showHelp2 && transformation == "reflection" && (
-          <Help helpFor={"reflection"} handleClose={() => setShowHelp2(false)} handleClose2={null}/>
+          <Help
+            helpFor={"reflection"}
+            handleClose={() => setShowHelp2(false)}
+            handleClose2={null}
+          />
         )}
         {showHelp2 && transformation == "rotation" && (
-          <Help helpFor={"rotation"} handleClose={() => setShowHelp2(false)} handleClose2={null}/>
+          <Help
+            helpFor={"rotation"}
+            handleClose={() => setShowHelp2(false)}
+            handleClose2={null}
+          />
         )}
         {showHelp2 && transformation == "translation" && (
-          <Help helpFor={"translation"} handleClose={() => setShowHelp2(false)} handleClose2={null}/>
+          <Help
+            helpFor={"translation"}
+            handleClose={() => setShowHelp2(false)}
+            handleClose2={null}
+          />
         )}
         {showHelp2 && transformation == "enlargement" && (
-          <Help helpFor={"enlargement"} handleClose={() => setShowHelp2(false)} handleClose2={null}/>
+          <Help
+            helpFor={"enlargement"}
+            handleClose={() => setShowHelp2(false)}
+            handleClose2={null}
+          />
         )}
-</> 
-
+      </>
     </>
   );
 }
