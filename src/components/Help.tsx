@@ -296,7 +296,7 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                 // style={{ "--fa-rotate-angle": "45deg" }} //fic later
               />
             </button>
-            <p
+            <div
               className={`m-0 mx-1 p-0 px-1 bg-white rounded border border-2 border-[${color1}] ${
                 step == 3 ? "help-glow" : "opacity-0"
               }`}
@@ -311,7 +311,7 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                 </div>
                 ]
               </div>
-            </p>
+            </div>
           </>
         )}
         {helpFor == "enlargement" && (
@@ -397,7 +397,7 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
         {helpFor == "general" && (
           <>
             {step == 1 && (
-              <p
+              <div
                 className="p-4 absolute text-base md:text-2xl help-glow-box"
                 style={{
                   top: "50%",
@@ -418,10 +418,10 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                 see how the <span className={`text-[${color1}]`}>object</span>{" "}
                 <span className={`text-[${color2}]`}>transforms.</span>
                 {renderSkipBtn(false)}
-              </p>
+              </div>
             )}
             {step == 2 && (
-              <p
+              <div
                 className="p-4 absolute text-base md:text-2xl"
                 style={{
                   top: `${getPos(polygonDemo).y - 50}px`,
@@ -436,10 +436,10 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                 <span className={`text-[${color1}]`}>objects</span>. Select this
                 tool and click on the grid to place your vertices.
                 {renderSkipBtn(true)}
-              </p>
+              </div>
             )}
             {step == 3 && (
-              <p
+              <div
                 className="p-4 absolute  text-base md:text-2xl"
                 style={{
                   top: `${getPos(selectDemo).y - 50}px`,
@@ -457,10 +457,10 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                 select <span className={`text-[${color1}]`}>objects</span> to
                 delete.
                 {renderSkipBtn(true)}
-              </p>
+              </div>
             )}
             {step == 4 && (
-              <p
+              <div
                 className="p-4 absolute  text-base md:text-2xl md:text-l"
                 style={{
                   top: `${getPos(deleteDemo).y - 50}px`,
@@ -472,12 +472,12 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                 <span className={`text-[${color1}]`}>objects</span> by clicking
                 on this button.
                 {renderSkipBtn(true)}
-              </p>
+              </div>
             )}
 
             {step == 5 && (
               <>
-                <p
+                <div
                   className="p-4 absolute  text-base md:text-2xl "
                   style={{
                     top: `${getPos(selectTransDemo).y + 10}px`,
@@ -492,12 +492,12 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                   </div>
                   &nbsp; You can change the transformation here.
                   {renderSkipBtn(true)}
-                </p>
+                </div>
               </>
             )}
             {step == 6 && (
               <>
-                <p
+                <div
                   className="p-4 absolute  text-base md:text-2xl "
                   style={{
                     top: `${getPos(infoDemo).y + 10}px`,
@@ -513,7 +513,7 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                   Click here to see more information about the selected
                   transformation.
                   {renderSkipBtn(true)}
-                </p>
+                </div>
               </>
             )}
           </>
@@ -521,7 +521,7 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
         {helpFor == "reflection" && (
           <>
             {step == 1 && (
-              <p
+              <div
                 className="p-4 absolute text-base md:text-2xl help-glow-box"
                 style={{
                   top: "50%",
@@ -532,10 +532,10 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                 Currently selected transformation is{" "}
                 <span className={`text-[${color2}]`}>'reflection'.</span>
                 {renderSkipBtn(false)}
-              </p>
+              </div>
             )}
             {step == 2 && (
-              <p
+              <div
                 className="p-4 absolute  text-base md:text-2xl"
                 style={{
                   top: `${getPos(mirrorDemo).y + 10}px`,
@@ -552,10 +552,10 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                 <span className="text-[pink]"> mirror line</span> connecting
                 them.
                 {renderSkipBtn(true)}
-              </p>
+              </div>
             )}
             {step == 3 && (
-              <p
+              <div
                 className="p-4 absolute  text-base md:text-2xl"
                 style={{
                   top: `${getPos(refEquationDemo).y + 10}px`,
@@ -571,10 +571,10 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                 You can see the equation of your{" "}
                 <span className="text-[pink]">mirror line</span> here.
                 {renderSkipBtn(true)}
-              </p>
+              </div>
             )}
             {step == 4 && (
-              <p
+              <div
                 className="p-4 absolute  text-base md:text-2xl"
                 style={{
                   bottom: 30,
@@ -588,14 +588,15 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                 &nbsp; If you want to see this tutorial again click on this
                 question mark.
                 {renderSkipBtn(true)}
-              </p>
+              </div>
+
             )}
           </>
         )}
         {helpFor == "rotation" && (
           <>
             {step == 1 && (
-              <p
+              <div
                 className="p-4 absolute text-base md:text-2xl help-glow-box"
                 style={{
                   top: "50%",
@@ -606,10 +607,10 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                 Currently selected transformation is{" "}
                 <span className={`text-[${color2}]`}>'rotation'.</span>
                 {renderSkipBtn(false)}
-              </p>
+              </div>
             )}
             {step == 2 && (
-              <p
+              <div
                 className="p-4 absolute  text-base md:text-2xl"
                 style={{
                   top: `${getPos(directionDemo).y + 10}px`,
@@ -626,10 +627,10 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                 <span className="text-[pink]"> direction of rotation</span>{" "}
                 here.
                 {renderSkipBtn(true)}
-              </p>
+              </div>
             )}
             {step == 3 && (
-              <p
+              <div
                 className="p-4 absolute  text-base md:text-2xl"
                 style={{
                   top: `${getPos(rotCenterDemo).y + 10}px`,
@@ -645,10 +646,10 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                 Use this tool to mark the
                 <span className="text-[pink]"> center of rotation.</span>
                 {renderSkipBtn(true)}
-              </p>
+              </div>
             )}
             {step == 4 && (
-              <p
+              <div
                 className="p-4 absolute  text-base md:text-2xl"
                 style={{
                   top: `${getPos(angleDemo).y + 10}px`,
@@ -664,10 +665,10 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                 <span className="text-[pink]"> Angle of rotation </span> can be
                 changed here.
                 {renderSkipBtn(true)}
-              </p>
+              </div>
             )}
             {step == 5 && (
-              <p
+              <div
                 className="p-4 absolute  text-base md:text-2xl"
                 style={{
                   top: `${getPos(rotEquationDemo).y + 10}px`,
@@ -691,10 +692,10 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                 </span>{" "}
                 here.
                 {renderSkipBtn(true)}
-              </p>
+              </div>
             )}
             {step == 6 && (
-              <p
+              <div
                 className="p-4 absolute  text-base md:text-2xl"
                 style={{
                   bottom: 30,
@@ -708,14 +709,14 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                 &nbsp; If you want to see this tutorial again click on this
                 question mark.
                 {renderSkipBtn(true)}
-              </p>
+              </div>
             )}
           </>
         )}
         {helpFor == "translation" && (
           <>
             {step == 1 && (
-              <p
+              <div
                 className="p-4 absolute text-base md:text-2xl help-glow-box"
                 style={{
                   top: "50%",
@@ -726,10 +727,10 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                 Currently selected transformation is{" "}
                 <span className={`text-[${color2}]`}>'translation'.</span>
                 {renderSkipBtn(false)}
-              </p>
+              </div>
             )}
             {step == 2 && (
-              <p
+              <div
                 className="p-4 absolute  text-base md:text-2xl"
                 style={{
                   top: `${getPos(vectorDemo).y + 10}px`,
@@ -747,11 +748,11 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                 anywhere on the grid. Select this tool and click on two points
                 to draw vector from the first point to the second point.
                 {renderSkipBtn(true)}
-              </p>
+              </div>
             )}
 
             {step == 3 && (
-              <p
+              <div
                 className="p-4 absolute  text-base md:text-2xl"
                 style={{
                   top: `${getPos(transEquationDemo).y + 10}px`,
@@ -767,10 +768,10 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                 You can see the current{" "}
                 <span className="text-[pink]"> translation vector</span> here.
                 {renderSkipBtn(true)}
-              </p>
+              </div>
             )}
             {step == 4 && (
-              <p
+              <div
                 className="p-4 absolute  text-base md:text-2xl"
                 style={{
                   bottom: 30,
@@ -784,14 +785,14 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                 &nbsp; If you want to see this tutorial again click on this
                 question mark.
                 {renderSkipBtn(true)}
-              </p>
+              </div>
             )}
           </>
         )}
         {helpFor == "enlargement" && (
           <>
             {step == 1 && (
-              <p
+              <div
                 className="p-4 absolute text-base md:text-2xl help-glow-box"
                 style={{
                   top: "50%",
@@ -802,10 +803,10 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                 Currently selected transformation is{" "}
                 <span className={`text-[${color2}]`}>'enlargement'.</span>
                 {renderSkipBtn(false)}
-              </p>
+              </div>
             )}
             {step == 2 && (
-              <p
+              <div
                 className="p-4 absolute  text-base md:text-2xl"
                 style={{
                   top: `${getPos(enCenterDemo).y + 10}px`,
@@ -822,11 +823,11 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                 <span className="text-[pink]"> center of enlargement</span>{" "}
                 anywhere on the grid.
                 {renderSkipBtn(true)}
-              </p>
+              </div>
             )}
 
             {step == 3 && (
-              <p
+              <div
                 className="p-4 absolute  text-base md:text-2xl"
                 style={{
                   top: `${getPos(scaleDemo).y + 10}px`,
@@ -844,10 +845,10 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                 </span>{" "}
                 can be be changed here.
                 {renderSkipBtn(true)}
-              </p>
+              </div>
             )}
             {step == 4 && (
-              <p
+              <div
                 className="p-4 absolute text-base md:text-2xl"
                 style={{
                   top: `${getPos(enEquationDemo).y + 60}px`,
@@ -866,10 +867,10 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                 </span>{" "}
                 are shown here.
                 {renderSkipBtn(true)}
-              </p>
+              </div>
             )}
             {step == 5 && (
-              <p
+              <div
                 className="p-4 absolute  text-base md:text-2xl"
                 style={{
                   bottom: 30,
@@ -883,7 +884,7 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                 &nbsp; If you want to see this tutorial again click on this
                 question mark.
                 {renderSkipBtn(true)}
-              </p>
+              </div>
             )}
           </>
         )}

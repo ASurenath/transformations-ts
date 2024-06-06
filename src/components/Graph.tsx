@@ -1141,6 +1141,7 @@ useEffect(()=>{
                 )}
                 {tempObjectPoints?.map((coord) => (
                   <circle
+                    key={`temp-point-${coord[0]}-${coord[1]}`}
                     name="object-temp-points"
                     cx={percentX(coord[0])}
                     cy={percentY(coord[1])}
@@ -1153,9 +1154,9 @@ useEffect(()=>{
 
 
             {/* reflection */}
-            {transformation == "reflection" &&hoveredPoint&& (
+            {transformation == "reflection" && (
               <>
-                {tempMirrorLinePoints.length == 1 &&
+                {tempMirrorLinePoints.length == 1 &&hoveredPoint&&
                   renderLine(
                     percentX(tempMirrorLinePoints[0][0]),
                     percentY(tempMirrorLinePoints[0][1]),
@@ -1183,7 +1184,7 @@ useEffect(()=>{
                     10 / zoom,
                     `${30 / zoom} ${15 / zoom}`
                   )}
-                {tempMirrorLinePoints.length == 1 && (
+                {tempMirrorLinePoints.length == 1 && hoveredPoint&&(
                   <>
                     <circle
                       name="temp-mirror-point-1"
