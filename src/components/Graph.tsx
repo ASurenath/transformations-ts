@@ -881,7 +881,7 @@ useEffect(()=>{
                 >
                   <i
                     className="fa-solid fa-arrow-up-long fa-rotate-by"
-                    // style={{ "--fa-rotate-angle": "45deg" }}  fix later
+                    style={{ "--fa-rotate-angle": "45deg" } as any}
                   />
                 </button>
                 <p className="m-0 mx-1 p-0 px-1 bg-white rounded border border-2 border-[${color1}]">
@@ -1935,7 +1935,6 @@ useEffect(()=>{
           <Help helpFor={"enlargement"} handleClose={() => setShowHelp2(false)} handleClose2={null}/>
         )}
 </> 
-{/* fix later */}
 
     </>
   );

@@ -583,7 +583,7 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
               >
                 <i
                   className="fa-regular fa-hand-point-left fa-fade fa-xl fa-rotate-by"
-                  // style={{ "--fa-rotate-angle": "-45deg" }} //fix later
+                  style={{ "--fa-rotate-angle": "-45deg" } as any} 
                 ></i>{" "}
                 &nbsp; If you want to see this tutorial again click on this
                 question mark.
@@ -703,7 +703,7 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
               >
                 <i
                   className="fa-regular fa-hand-point-left fa-fade fa-xl fa-rotate-by"
-                  // style={{ "--fa-rotate-angle": "-45deg" }} //fix later
+                  style={{ "--fa-rotate-angle": "-45deg" } as any} 
                 ></i>{" "}
                 &nbsp; If you want to see this tutorial again click on this
                 question mark.
@@ -779,7 +779,7 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
               >
                 <i
                   className="fa-regular fa-hand-point-left fa-fade fa-xl fa-rotate-by"
-                  // style={{ "--fa-rotate-angle": "-45deg" }} //fix later
+                  style={{ "--fa-rotate-angle": "-45deg" } as any} 
                 ></i>{" "}
                 &nbsp; If you want to see this tutorial again click on this
                 question mark.
@@ -878,7 +878,7 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
               >
                 <i
                   className="fa-regular fa-hand-point-left fa-fade fa-xl fa-rotate-by"
-                  // style={{ "--fa-rotate-angle": "-45deg" }} //fix later
+                  style={{ "--fa-rotate-angle": "-45deg" } as any} 
                 ></i>{" "}
                 &nbsp; If you want to see this tutorial again click on this
                 question mark.
