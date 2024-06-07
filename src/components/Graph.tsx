@@ -190,6 +190,8 @@ function Graph({
   });
   const [showDeletePrompt, setShowDeletePrompt] = useState<boolean>(false);
   const [showCoords, setShowCoords] = useState<boolean>(false);
+  const [isChangeInAngle, setIsChangeInAngle] = useState<boolean>(false);
+  const [isChangeInScale, setIsChangeInScale] = useState<boolean>(false);
   // object
   const [objects, setObjects] = useState<objectsState>({
     demo: [
@@ -241,7 +243,7 @@ function Graph({
     [[number, number], [number, number]]
   >([
     [0, 0],
-    [3, 1],
+    [9, 5],
   ]);
   const [transImages, setTransImages] = useState<objectsState>({});
 
@@ -286,6 +288,28 @@ function Graph({
       }
     }
   }, [transformation]);
+  useEffect(() => {
+    setIsChangeInAngle(true); 
+  
+    const timeoutId = setTimeout(() => {
+      setIsChangeInAngle(false); 
+    }, 300);
+  
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [rotationAngle]);
+  useEffect(() => {
+    setIsChangeInScale(true); 
+  
+    const timeoutId = setTimeout(() => {
+      setIsChangeInScale(false); 
+    }, 300);
+  
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [enlargementFactor]);
   // console.log(isVisited);
 
   // reflection
@@ -626,8 +650,7 @@ function Graph({
       }
     }
   };
-  console.log(draggingSomething);
-  console.log(selectedObjectPoint);
+  console.log(tempMirrorLinePoints);
 
   const handleClick = (e: any) => {
     if (graphBox.current) {
@@ -749,19 +772,19 @@ function Graph({
   };
   const renderScaleDescription = (f: number) => {
     if (f == 1) {
-      return "Image has same size as object";
+      return <>Image has <b>same size</b> as object</>
     } else if (f == 0) {
-      return "Image is a point at the center of enlargement";
+      return <>Image is a point at the center of enlargement</>;
     } else if (f == -1) {
-      return "Image has same size as the object but it's inverted as the scale factor is negative";
+      return <>Image has <b>same size</b> as the object but it's <b>inverted</b> as the scale factor is <b>negative</b></>
     } else if (f > 1) {
-      return "Image is bigger than the object as magnitude of the scale factor is greater than 1";
+      return <>Image is <b>bigger</b> than the object as magnitude of the scale factor is <b>greater than 1</b></>;
     } else if (f > 0) {
-      return "Image is smaller than the object as magnitude of the scale factor is less than 1";
+      return <>Image is <b>smaller</b> than the object as magnitude of the scale factor is <b>less than 1</b> </>;
     } else if (f > -1) {
-      return "Image is smaller than the object as the scale factor has a magnitude less than 1. And it's inverted as the scale factor is negative";
+      return <>Image is <b>smaller</b> than the object as the scale factor has a <b>magnitude less than 1</b>. And it's <b>inverted</b> as the scale factor is <b>negative</b></>;
     } else {
-      return "Image is bigger than the object as the scale factor has a magnitude greater than 1. And it's inverted as the scale factor is negative";
+      return <>Image is <b>bigger</b> than the object as the scale factor has a <b>magnitude greater than 1</b>. And it's <b>inverted</b> as the scale factor is <b>negative</b></>;
     }
   };
   const coordPos = ([x1, y1]: [number, number], [x2, y2]: [number, number]) => {
@@ -998,7 +1021,7 @@ function Graph({
                   <i className="fa-solid fa-slash"></i>
                 </button>
                 <p
-                  className={`mx-1 p-1 bg-white rounded border border-2 border-[${color1}]`}
+                  className={`mx-1 p-1 ${tempMirrorLinePoints.length > 0 ?'bg-yellow-100':'bg-white' } rounded border border-2 border-[${color1}]`}
                 >
                   Reflection on the line{" "}
                   <span className="font-bold text-[#800080]">
@@ -1088,7 +1111,7 @@ function Graph({
                   {/* <div className="absolute right-1 top-1/2 -translate-y-1/2 bg-white py-1 px-1 text-gray-300 peer-placeholder-shown:text-white peer-focus:text-gray-300">°</div> */}
                 </div>
                 <p
-                  className={`mx-1 p-1 bg-white rounded border border-2 border-[${color1}]`}
+                  className={`mx-1 p-1 bg-white rounded border border-2 border-[${color1}] ${(draggingSpecialPoint=="center-of-rotation")||isChangeInAngle?"bg-yellow-100":"bg-white"}`}
                 >
                   <span className="font-bold text-[#800080]">
                     {rotationAngle}°{" "}
@@ -1120,21 +1143,17 @@ function Graph({
                     style={{ "--fa-rotate-angle": "45deg" } as any}
                   />
                 </button>
-                <p className="m-0 mx-1 p-0 px-1 bg-white rounded border border-2 border-[${color1}]">
-                  Translation by the vector{" "}
-                  <div className="inline-flex text-[#800080] text-3xl p-0">
-                    [
-                    <div className="inline-flex flex-col text-sm justify-center">
-                      <p className="p-0 m-0">
+                <div className={`flex m-0 mx-1 p-1 px-1 bg-white rounded border border-2 border-[${color1}] ${(draggingSpecialPoint=="trans-vector-1")||(draggingSpecialPoint=="trans-vector-2")?"bg-yellow-100":"bg-white"}`}>
+                  <div className="p-1.5">Translation by the vector </div>
+                    <div className="inline-flex flex-col vector p-0 px-1 m-0 text-sm justify-center">
+                      <div className="p-0 m-0 leading-4 text-[#800080]">
                         {transVector[1][0] - transVector[0][0]}
-                      </p>
-                      <p className="p-0 m-0">
+                      </div>
+                      <div className="p-0 m-0 leading-4 text-[#800080]">
                         {transVector[1][1] - transVector[0][1]}
-                      </p>
+                      </div>
                     </div>
-                    ]
-                  </div>
-                </p>
+                </div>
               </>
             )}
             {transformation == "enlargement" && (
@@ -1199,7 +1218,7 @@ function Graph({
                     step={0.1}
                   />
                 </div>
-                <p className="mx-1 p-2 bg-white rounded border border-2 border-[${color1}]">
+                <p className={`mx-1 p-2 bg-white rounded border border-2 border-[${color1}] ${(draggingSpecialPoint=="center-of-enlargement")||isChangeInScale?"bg-yellow-100":"bg-white"}`}>
                   {" "}
                   Enlargement w.r.t. the point{" "}
                   <span className="font-bold text-[#800080]">
@@ -2613,6 +2632,7 @@ function Graph({
             handleClose2={() => {
               setShowHelp1(false);
             }}
+            transformation={transformation}
           />
         )}
         {showHelp2 && transformation == "reflection" && (
@@ -2620,6 +2640,8 @@ function Graph({
             helpFor={"reflection"}
             handleClose={() => setShowHelp2(false)}
             handleClose2={null}
+            transformation={transformation}
+
           />
         )}
         {showHelp2 && transformation == "rotation" && (
@@ -2627,6 +2649,8 @@ function Graph({
             helpFor={"rotation"}
             handleClose={() => setShowHelp2(false)}
             handleClose2={null}
+            transformation={transformation}
+
           />
         )}
         {showHelp2 && transformation == "translation" && (
@@ -2634,6 +2658,8 @@ function Graph({
             helpFor={"translation"}
             handleClose={() => setShowHelp2(false)}
             handleClose2={null}
+            transformation={transformation}
+
           />
         )}
         {showHelp2 && transformation == "enlargement" && (
@@ -2641,6 +2667,7 @@ function Graph({
             helpFor={"enlargement"}
             handleClose={() => setShowHelp2(false)}
             handleClose2={null}
+            transformation={transformation}
           />
         )}
       </>

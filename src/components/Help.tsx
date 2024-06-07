@@ -1,6 +1,6 @@
 import React, { HtmlHTMLAttributes, useEffect, useRef, useState } from "react";
 
-function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handleClose2: any|null, helpFor: string }) {
+function Help({ handleClose, handleClose2, helpFor,transformation }: { handleClose: any, handleClose2: any|null, helpFor: string,transformation: string }) {
   const [step, setStep] = useState(1);
   const polygonDemo = useRef<HTMLButtonElement>(null);
   const selectDemo = useRef<HTMLButtonElement>(null);
@@ -141,11 +141,11 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
             step == 5 && helpFor == "general" ? "help-glow" : "opacity-0"
           }`}
         >
-          {helpFor == "rotation" && <option value="rotation">Rotation</option>}
-          {helpFor == "translation" && (
+          {transformation == "rotation" && <option value="rotation">Rotation</option>}
+          {transformation == "translation" && (
             <option value="translation">Translation</option>
           )}
-          {helpFor == "enlargement" && (
+          {transformation == "enlargement" && (
             <option value="enlargement">Enlargement</option>
           )}
           <option value="reflection">Reflection</option>
@@ -297,20 +297,20 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
               />
             </button>
             <div
-              className={`m-0 mx-1 p-0 px-1 bg-white rounded border border-2 border-[${color1}] ${
+              className={`flex m-0 mx-1 p-1 px-1 bg-white rounded border border-2 border-[${color1}] ${
                 step == 3 ? "help-glow" : "opacity-0"
               }`}
               ref={transEquationDemo}
             >
-              Translation by the vector{" "}
-              <div className="inline-flex text-[#800080] text-3xl p-0">
-                [
-                <div className="inline-flex flex-col text-sm justify-center">
-                  <p className="p-0 m-0">{3}</p>
-                  <p className="p-0 m-0">{1}</p>
-                </div>
-                ]
-              </div>
+               <div className="p-1.5">Translation by the vector </div>
+                    <div className="inline-flex flex-col vector p-0 px-1 m-0 text-sm justify-center">
+                      <div className="p-0 m-0 leading-4 text-[#800080]">
+                        {3}
+                      </div>
+                      <div className="p-0 m-0 leading-4 text-[#800080]">
+                        {1}
+                      </div>
+                    </div>
             </div>
           </>
         )}
@@ -365,8 +365,8 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
               {" "}
               Enlargement w.r.t. the point{" "}
               <span className=" text-[#800080]">(-9, 9)</span> by the factor{" "}
-              <span className=" text-[#800080]">{2}</span>. Image is bigger than
-              the object as magnitude of the scale factor is greater than 1
+              <span className=" text-[#800080]">{2}</span>. Image is <b>bigger</b> than
+              the object as magnitude of the scale factor is <b>greater than 1</b>
             </p>
           </>
         )}

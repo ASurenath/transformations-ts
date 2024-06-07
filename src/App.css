@@ -86,3 +86,9 @@
 .text-outline{
   text-shadow: -1px -1px 0 #ffffff, 1px -1px 0 #ffffff, -1px 1px 0 #ffffff, 1px 1px 0 #ffffff;
 }
+.vector{
+  display: inline-flex;
+  flex-direction: column;
+  border: 3px solid transparent;
+  border-image: url(vector-border.png) 30 stretch;
+}
