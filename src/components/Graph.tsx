@@ -257,15 +257,25 @@ function Graph({
 
   const color1: string = "#1783b8";
   const color2: string = "#4dc0ae";
+  const color3: string = "#a1e6db";
   const zoomFactor: number = 30;
 
   // drag
   const [dragStart, setDragStart] = useState<[number, number] | null>(null);
-  const [draggingObject, setDraggingObject] = useState<string>("");
-  const [draggingPoint, setDraggingPoint] = useState<[string, number] | null>(
+  const [draggingObject, setDraggingObject] = useState<
+    [string, [number, number][]]
+  >(["", []]);
+  const [draggingPoint, setDraggingPoint] = useState<[string, number][] | null>(
     null
   );
   const [draggingSpecialPoint, setDraggingSpecialPoint] = useState<string>("");
+  const [draggingSomething, setDraggingSomething] = useState<boolean>(false);
+  const [isSelectedPointInSelectedObject, setIsSelectedPointInSelectedObject] =
+    useState<boolean>(false);
+  const [
+    selectedPointIndexInSelectedObject,
+    setSelectedPointIndexInSelectedObject,
+  ] = useState<number>(0);
 
   // console.log(objects);
   useEffect(() => {
@@ -358,6 +368,7 @@ function Graph({
     if (tool != "select") {
       setSelectedObjectPoint(null);
       setSelectedObject("");
+      setIsSelectedPointInSelectedObject(false);
     }
   }, [tool]);
   // initial scroll
@@ -550,6 +561,8 @@ function Graph({
     setZoom(z);
   };
   const handleMove = (e: any) => {
+    e = e.touches?.[0] || e;
+    let tempObjects: objectsState = objects;
     if (graphBox.current) {
       let rect = graphBox.current.getBoundingClientRect();
       let x =
@@ -562,11 +575,43 @@ function Graph({
           ((e.clientY - rect.height - rect.y) * (y1 - y2)) /
             (((y2 - y1) * zoomFactor * zoom) / 100)
         ) + y1;
-      e = e.touches?.[0] || e;
       if (x > x1 && x < x2 && y > y1 && y < y2) {
         setHoveredPoint([x, y]);
         if (tool == "select") {
-          if (
+          // let tempSelectedObjectPoint: [number, number]|null = selectedObjectPoint;
+          if (dragStart && draggingObject[0] == selectedObject) {
+            tempObjects[selectedObject] = draggingObject[1].map(
+              (point): [number, number] => [
+                point[0] + x - dragStart[0],
+                point[1] + y - dragStart[1],
+              ]
+            );
+            if (isSelectedPointInSelectedObject) {
+              setSelectedObjectPoint(
+                tempObjects[selectedObject][selectedPointIndexInSelectedObject]
+              );
+            }
+            setObjects({ ...tempObjects });
+          } else if (draggingPoint) {
+            for (let i = 0; i < draggingPoint.length; i++) {
+              tempObjects[draggingPoint[i][0]].splice(draggingPoint[i][1], 1, [
+                x,
+                y,
+              ]);
+            }
+            setObjects({ ...tempObjects });
+            setSelectedObjectPoint([x, y]);
+          } else if (draggingSpecialPoint != "") {
+            if (draggingSpecialPoint == "center-of-rotation") {
+              setCenterOfRotation([x, y]);
+            } else if (draggingSpecialPoint == "center-of-enlargement") {
+              setCenterOfEnlargement([x, y]);
+            } else if (draggingSpecialPoint == "trans-vector-1") {
+              setTransVector([[x, y], transVector[1]]);
+            } else if (draggingSpecialPoint == "trans-vector-2") {
+              setTransVector([transVector[0], [x, y]]);
+            }
+          } else if (
             Object.values(objects)
               .flat()
               .some((point) => point.join(",") === `${x},${y}`)
@@ -581,6 +626,8 @@ function Graph({
       }
     }
   };
+  console.log(draggingSomething);
+  console.log(selectedObjectPoint);
 
   const handleClick = (e: any) => {
     if (graphBox.current) {
@@ -653,8 +700,9 @@ function Graph({
             setSelectedObjectPoint([x, y]);
             console.log("object removed");
             setSelectedObject("");
+            setIsSelectedPointInSelectedObject(false);
           } else {
-            setSelectedObjectPoint(null);
+            // if(!draggingSomething){setSelectedObjectPoint(null);}
             if (selectedObject && !e.target.closest(".objects-polygons")) {
               console.log("no polygon");
               if (
@@ -664,6 +712,7 @@ function Graph({
                 selectionCoordinates.y2 < y
               ) {
                 setSelectedObject("");
+                setIsSelectedPointInSelectedObject(false);
               }
             }
           }
@@ -695,6 +744,7 @@ function Graph({
       delete tempObjects[selectedObject];
       setObjects({ ...tempObjects });
       setSelectedObject("");
+      setIsSelectedPointInSelectedObject(false);
     }
   };
   const renderScaleDescription = (f: number) => {
@@ -725,31 +775,55 @@ function Graph({
     console.log(coords);
     return coords;
   };
-  // const handleDragObjectStart = (e: any, key: string) => {
-  //   console.log("drag start", key);
-    
-  //   e = e.touches?.[0] || e;
-  //   if (graphBox.current && selectedObject) {
-  //     let rect = graphBox.current.getBoundingClientRect();
-  //     let x =
-  //       Math.round(
-  //         ((e.clientX - rect.x) * (x2 - x1)) /
-  //           (((x2 - x1) * zoomFactor * zoom) / 100)
-  //       ) + x1;
-  //     let y =
-  //       Math.round(
-  //         ((e.clientY - rect.height - rect.y) * (y1 - y2)) /
-  //           (((y2 - y1) * zoomFactor * zoom) / 100)
-  //       ) + y1;
-  //     if (x > x1 && x < x2 && y > y1 && y < y2) {
-  //       setDragStart([x, y]);
-  //       setDraggingObject(key);
-  //     } else {
-  //       setDragStart(null);
-  //       setDraggingObject("");
-  //     }
-  //   }
-  // };
+  const handleDragObjectStart = (e: any, key: string) => {
+    console.log("drag start", key);
+
+    e = e.touches?.[0] || e;
+    if (graphBox.current && selectedObject) {
+      let rect = graphBox.current.getBoundingClientRect();
+      let x =
+        Math.round(
+          ((e.clientX - rect.x) * (x2 - x1)) /
+            (((x2 - x1) * zoomFactor * zoom) / 100)
+        ) + x1;
+      let y =
+        Math.round(
+          ((e.clientY - rect.height - rect.y) * (y1 - y2)) /
+            (((y2 - y1) * zoomFactor * zoom) / 100)
+        ) + y1;
+      if (x > x1 && x < x2 && y > y1 && y < y2) {
+        setDraggingSomething(true);
+        setDragStart([x, y]);
+        setDraggingObject([
+          key,
+          objects[key].map((point) => [point[0], point[1]]),
+        ]);
+      } else {
+        setDragStart(null);
+        setDraggingObject(["", []]);
+      }
+    }
+  };
+  const dragPointStart = () => {
+    let tempDragPoints: [string, number][] = [];
+    for (let key of Object.keys(objects)) {
+      console.log(key);
+      console.log(objects[key]);
+      for (let i = 0; i < objects[key].length; i++) {
+        let point = objects[key][i];
+        console.log("point", point);
+        console.log("selectedObjectPoint", selectedObjectPoint);
+        if (
+          point[0] === selectedObjectPoint?.[0] &&
+          point[1] === selectedObjectPoint?.[1]
+        ) {
+          tempDragPoints.push([key, i]);
+        }
+      }
+    }
+    setDraggingSomething(true);
+    setDraggingPoint(tempDragPoints);
+  };
   // const handleDragObject = (e: any, key: string) => {
   //   if (graphBox.current&&selectedObject) {
   //     e = e.touches?.[0] || e;
@@ -764,7 +838,7 @@ function Graph({
   //       Math.round(
   //         ((e.clientY - rect.height - rect.y) * (y1 - y2)) /
   //           (((y2 - y1) * zoomFactor * zoom) / 100)
-  //       ) + y1;    
+  //       ) + y1;
   //     if (x > x1 && x < x2 && y > y1 && y < y2) {
   //       if (dragStart&&draggingObject===key&&draggingObject!=="") {
   //         tempObjects[selectedObject] = tempObjects[selectedObject].map(
@@ -777,12 +851,42 @@ function Graph({
   //     }
   //   }
   // };
-  // const handleDragEnd = () => {
-  //   setDragStart(null);
-  //   setDraggingObject("");
-  //   setDraggingPoint(null) 
-  //   setDraggingSpecialPoint("")
-  // }
+  const handleDragEnd = () => {
+    setDraggingSomething(false);
+    setDragStart(null);
+    setDraggingObject(["", []]);
+    setDraggingPoint(null);
+    setDraggingSpecialPoint("");
+  };
+  const handleSelectObject = (key: string) => {
+    if (tool == "select") {
+      setSelectedObject(key);
+      if (
+        selectedObjectPoint &&
+        objects[key]
+          .map((point) => `${point[0]},${point[1]}`)
+          .includes(`${selectedObjectPoint[0]},${selectedObjectPoint[1]}`)
+      ) {
+        setIsSelectedPointInSelectedObject(true);
+        setSelectedPointIndexInSelectedObject(
+          objects[key]
+            .map((point) => `${point[0]},${point[1]}`)
+            .indexOf(`${selectedObjectPoint[0]},${selectedObjectPoint[1]}`)
+        );
+      } else {
+        setIsSelectedPointInSelectedObject(false);
+      }
+    }
+    // console.log("object selected");
+  };
+  const handleKeyDown = (e: any) => {
+    if (e.key == "Delete"||e.key=="Backspace") {
+      console.log("delete");
+      if (selectedObject) {
+        handleDelete();
+      }
+    }
+  };
   return (
     <>
       <div
@@ -802,8 +906,8 @@ function Graph({
           ref={graphBox}
         >
           <div
-            className="tools fixed flex flex-col justify-center items-start p-1"
-            style={{ height: "100vh" }}
+            className="tools fixed flex flex-col justify-center items-start p-1 bg-black bg-opacity-10 rounded-xl"
+            style={{ transform: "translateY(calc(50vh - 80px))" }}
           >
             <button
               type="button"
@@ -857,8 +961,8 @@ function Graph({
             </button> */}
           </div>
           <div
-            className="tools fixed flex flex-wrap justify-start items-start p-1"
-            style={{ width: "100vw" }}
+            className="tools fixed flex flex-wrap justify-start items-start p-1 bg-black bg-opacity-10 rounded-sm"
+            // style={{ width: "100vw" }}
           >
             <select
               className={`p-1 mb-1 bg-white rounded border border-2 border-[${color1}] focus:border-[${color2}]`}
@@ -945,7 +1049,7 @@ function Graph({
                   <i className="fa-solid fa-circle"></i>
                 </button>
 
-                <div className="relative mt-2 w-50 flex">
+                <div className="relative w-50 flex">
                   <input
                     type="range"
                     onChange={(e) => {
@@ -956,7 +1060,7 @@ function Graph({
                     min={0}
                     max={360}
                     id="angle-slider"
-                    className="peer w-25"
+                    className="peer w-25 mt-3"
                   />
                   <input
                     type="number"
@@ -977,13 +1081,15 @@ function Graph({
                     className={`peer block w-15 p-1 bg-white rounded border border-2 border-[${color1}] focus:border-[${color2}] w-16 text-center`}
                     placeholder=" "
                   />
-                  <label className="absolute top-2 left-1 z-10 origin-[0] -translate-y-4 scale-75 transform cursor-text select-none bg-white px-2 text-sm text-gray-500 duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:px-2 peer-focus:text-blue-600">
+                  <label className="absolute top-3.5 left-1 z-10 origin-[0] -translate-y-4 scale-75 transform cursor-text select-none bg-white px-2 text-sm text-gray-500 duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:px-2 peer-focus:text-blue-600">
                     {" "}
                     Rotation angle (deg){" "}
                   </label>
                   {/* <div className="absolute right-1 top-1/2 -translate-y-1/2 bg-white py-1 px-1 text-gray-300 peer-placeholder-shown:text-white peer-focus:text-gray-300">°</div> */}
                 </div>
-                <p className="mx-1 p-1 bg-white rounded border border-2 border-[${color1}]">
+                <p
+                  className={`mx-1 p-1 bg-white rounded border border-2 border-[${color1}]`}
+                >
                   <span className="font-bold text-[#800080]">
                     {rotationAngle}°{" "}
                   </span>
@@ -1157,6 +1263,7 @@ function Graph({
           </div>
 
           <svg
+
             height={((y2 - y1) * zoomFactor * zoom) / 100}
             width={((x2 - x1) * zoomFactor * zoom) / 100}
             xmlns="http://www.w3.org/2000/svg"
@@ -1167,14 +1274,16 @@ function Graph({
             onTouchMove={(e) => {
               handleMove(e);
             }}
-            onClick={(e) => {
-              handleClick(e);
-            }}
             onTouchEnd={(e) => {
               handleClick(e);
             }}
-            // onMouseUp={handleDragEnd}
-            // onMouseLeave={handleDragEnd}
+            onMouseUp={handleDragEnd}
+            onMouseLeave={handleDragEnd}
+            onClick={(e) => {
+              handleClick(e);
+            }}
+            tabIndex={0}
+            onKeyDown={handleKeyDown}
             // onTouchEnd={(e) => {
             //   handleClick(e);
             // }}
@@ -1344,8 +1453,8 @@ function Graph({
                         (coord) => `${percentX(coord[0])},${percentY(coord[1])}`
                       )
                       .join(" ")}
-                    stroke={color2}
-                    fill={color2}
+                    stroke={color3}
+                    fill={color3}
                     fillOpacity={0.5}
                     strokeWidth={15 / zoom}
                   ></polygon>
@@ -1373,13 +1482,13 @@ function Graph({
                         (coord) => `${percentX(coord[0])},${percentY(coord[1])}`
                       )
                       .join(" ")}
-                    stroke={color2}
-                    fill={color2}
+                    stroke={color3}
+                    fill={color3}
                     fillOpacity={0.5}
                     strokeWidth={15 / zoom}
                   ></polygon>
                 ))}
-                {/* <polygon id="test" points={rotatedImages?.map(coord => `${percentX(coord[0])},${percentY(coord[1])}`).join(' ')} stroke={color2} fill={color2} fillOpacity={.5} strokeWidth={.3}></polygon> */}
+                {/* <polygon id="test" points={rotatedImages?.map(coord => `${percentX(coord[0])},${percentY(coord[1])}`).join(' ')} stroke={color3} fill={color3} fillOpacity={.5} strokeWidth={.3}></polygon> */}
               </>
             )}
             {/* translation */}
@@ -1398,84 +1507,92 @@ function Graph({
                       strokeDasharray="none"
                       markerEnd="url(#vector-arrow)"
                     />
-                    <line
-                      name="trans-vector-X"
-                      x1={percentX(transVector[0][0])}
-                      y1={percentY(transVector[0][1])}
-                      x2={percentX(transVector[1][0])}
-                      y2={percentY(transVector[0][1])}
-                      stroke="purple"
-                      opacity={0.3}
-                      strokeWidth={10 / zoom}
-                      strokeDasharray="none"
-                      markerEnd="url(#vector-arrow)"
-                    />
-                    <g id="trans-vector-x-label">
-                      <rect
-                        x={percentX(
-                          (transVector[0][0] + transVector[1][0]) / 2
-                        )}
-                        y={percentY(transVector[0][1])}
-                        width={80 / zoom}
-                        height={80 / zoom}
-                        fill="white"
-                        opacity={0.8}
-                        transform={`translate(${-40 / zoom} ${-40 / zoom})`}
-                        rx={30 / zoom}
-                        ry={30 / zoom}
-                      />
-                      <text
-                        x={percentX(
-                          (transVector[0][0] + transVector[1][0]) / 2
-                        )}
-                        y={percentY(transVector[0][1])}
-                        fill="purple"
-                        fontSize={40 / zoom}
-                        textAnchor="middle"
-                        alignmentBaseline="middle"
-                      >
-                        {transVector[1][0] - transVector[0][0]}
-                      </text>
-                    </g>
-                    <g id="trans-vector-y-label">
-                      <rect
-                        x={percentX(transVector[1][0])}
-                        y={percentY(
-                          (transVector[0][1] + transVector[1][1]) / 2
-                        )}
-                        width={80 / zoom}
-                        height={80 / zoom}
-                        fill="white"
-                        opacity={0.8}
-                        transform={`translate(${-40 / zoom} ${-40 / zoom})`}
-                        rx={30 / zoom}
-                        ry={30 / zoom}
-                      />
-                      <text
-                        x={percentX(transVector[1][0])}
-                        y={percentY(
-                          (transVector[0][1] + transVector[1][1]) / 2
-                        )}
-                        fill="purple"
-                        fontSize={40 / zoom}
-                        textAnchor="middle"
-                        alignmentBaseline="middle"
-                      >
-                        {Math.abs(transVector[1][1] - transVector[0][1])}
-                      </text>
-                    </g>
-                    <line
-                      name="trans-vector-y"
-                      x1={percentX(transVector[1][0])}
-                      y1={percentY(transVector[0][1])}
-                      x2={percentX(transVector[1][0])}
-                      y2={percentY(transVector[1][1])}
-                      stroke="purple"
-                      opacity={0.3}
-                      strokeWidth={10 / zoom}
-                      strokeDasharray="none"
-                      markerEnd="url(#vector-arrow)"
-                    />
+                    {transVector[1][0] - transVector[0][0] !== 0 && (
+                      <g>
+                        <line
+                          name="trans-vector-X"
+                          x1={percentX(transVector[0][0])}
+                          y1={percentY(transVector[0][1])}
+                          x2={percentX(transVector[1][0])}
+                          y2={percentY(transVector[0][1])}
+                          stroke="purple"
+                          opacity={0.3}
+                          strokeWidth={10 / zoom}
+                          strokeDasharray="none"
+                          markerEnd="url(#vector-arrow)"
+                        />
+                        <g id="trans-vector-x-label">
+                          <rect
+                            x={percentX(
+                              (transVector[0][0] + transVector[1][0]) / 2
+                            )}
+                            y={percentY(transVector[0][1])}
+                            width={80 / zoom}
+                            height={80 / zoom}
+                            fill="white"
+                            opacity={0.8}
+                            transform={`translate(${-40 / zoom} ${-40 / zoom})`}
+                            rx={30 / zoom}
+                            ry={30 / zoom}
+                          />
+                          <text
+                            x={percentX(
+                              (transVector[0][0] + transVector[1][0]) / 2
+                            )}
+                            y={percentY(transVector[0][1])}
+                            fill="purple"
+                            fontSize={40 / zoom}
+                            textAnchor="middle"
+                            alignmentBaseline="middle"
+                          >
+                            {transVector[1][0] - transVector[0][0]}
+                          </text>
+                        </g>
+                      </g>
+                    )}
+                    {transVector[1][1] - transVector[0][1] !== 0 && (
+                      <g>
+                        <g id="trans-vector-y-label">
+                          <rect
+                            x={percentX(transVector[1][0])}
+                            y={percentY(
+                              (transVector[0][1] + transVector[1][1]) / 2
+                            )}
+                            width={80 / zoom}
+                            height={80 / zoom}
+                            fill="white"
+                            opacity={0.8}
+                            transform={`translate(${-40 / zoom} ${-40 / zoom})`}
+                            rx={30 / zoom}
+                            ry={30 / zoom}
+                          />
+                          <text
+                            x={percentX(transVector[1][0])}
+                            y={percentY(
+                              (transVector[0][1] + transVector[1][1]) / 2
+                            )}
+                            fill="purple"
+                            fontSize={40 / zoom}
+                            textAnchor="middle"
+                            alignmentBaseline="middle"
+                          >
+                            {Math.abs(transVector[1][1] - transVector[0][1])}
+                          </text>
+                        </g>
+                        <line
+                          name="trans-vector-y"
+                          x1={percentX(transVector[1][0])}
+                          y1={percentY(transVector[0][1])}
+                          x2={percentX(transVector[1][0])}
+                          y2={percentY(transVector[1][1])}
+                          stroke="purple"
+                          opacity={0.3}
+                          strokeWidth={10 / zoom}
+                          strokeDasharray="none"
+                          markerEnd="url(#vector-arrow)"
+                        />
+                      </g>
+                    )}
                   </>
                 )}
 
@@ -1521,8 +1638,8 @@ function Graph({
                         (coord) => `${percentX(coord[0])},${percentY(coord[1])}`
                       )
                       .join(" ")}
-                    stroke={color2}
-                    fill={color2}
+                    stroke={color3}
+                    fill={color3}
                     fillOpacity={0.5}
                     strokeWidth={15 / zoom}
                   ></polygon>
@@ -1550,8 +1667,8 @@ function Graph({
                         (coord) => `${percentX(coord[0])},${percentY(coord[1])}`
                       )
                       .join(" ")}
-                    stroke={color2}
-                    fill={color2}
+                    stroke={color3}
+                    fill={color3}
                     fillOpacity={0.5}
                     strokeWidth={15 / zoom}
                   ></polygon>
@@ -1577,10 +1694,9 @@ function Graph({
                   fillOpacity={0.5}
                   strokeWidth={15 / zoom}
                   onClick={() => {
-                    tool == "select" && setSelectedObject(key);
-                    // console.log("object selected");
+                    handleSelectObject(key);
                   }}
-                  // onMouseDown={(e) => handleDragObjectStart(e, key)}
+                  onMouseDown={(e) => handleDragObjectStart(e, key)}
                   // onMouseMove={(e) => handleDragObject(e, key)}
                 ></polygon>
               </>
@@ -1605,7 +1721,11 @@ function Graph({
                   strokeWidth={15 / zoom}
                   strokeDasharray={`${30 / zoom} ${15 / zoom}`}
                 />
-                <g onClick={handleDelete} className="cursor-pointer">
+                <g
+                  onClick={handleDelete}
+                  className="cursor-pointer"
+                  xlinkTitle="delete"
+                >
                   <rect
                     name="delete-box"
                     x={percentX(selectionCoordinates.x2) - 40 / zoom}
@@ -2070,104 +2190,112 @@ function Graph({
                     strokeDasharray="none"
                     markerEnd="url(#arrow)"
                   />
-                  <line
-                    name="translation-line-x"
-                    x1={percentX(selectedObjectPoint[0])}
-                    y1={percentY(selectedObjectPoint[1])}
-                    x2={percentX(
-                      translate(selectedObjectPoint, transVector)[0]
-                    )}
-                    y2={percentY(selectedObjectPoint[1])}
-                    stroke="grey"
-                    opacity={0.6}
-                    strokeWidth={10 / zoom}
-                    strokeDasharray="none"
-                    markerEnd="url(#arrow)"
-                  />
-                  <line
-                    name="translation-line-y"
-                    x1={percentX(
-                      translate(selectedObjectPoint, transVector)[0]
-                    )}
-                    y1={percentY(selectedObjectPoint[1])}
-                    x2={percentX(
-                      translate(selectedObjectPoint, transVector)[0]
-                    )}
-                    y2={percentY(
-                      translate(selectedObjectPoint, transVector)[1]
-                    )}
-                    stroke="grey"
-                    opacity={0.6}
-                    strokeWidth={10 / zoom}
-                    strokeDasharray="none"
-                    markerEnd="url(#arrow)"
-                  />
-                  <g id="trans-line-x-label">
-                    <rect
-                      x={percentX(
-                        (selectedObjectPoint[0] +
-                          translate(selectedObjectPoint, transVector)[0]) /
-                          2
-                      )}
-                      y={percentY(selectedObjectPoint[1])}
-                      width={80 / zoom}
-                      height={80 / zoom}
-                      fill="white"
-                      opacity={0.8}
-                      transform={`translate(${-40 / zoom} ${-40 / zoom})`}
-                      rx={30 / zoom}
-                      ry={30 / zoom}
-                    />
-                    <text
-                      x={percentX(
-                        (selectedObjectPoint[0] +
-                          translate(selectedObjectPoint, transVector)[0]) /
-                          2
-                      )}
-                      y={percentY(selectedObjectPoint[1])}
-                      fill="darkslategray"
-                      fontSize={40 / zoom}
-                      textAnchor="middle"
-                      alignmentBaseline="middle"
-                    >
-                      {transVector[1][0] - transVector[0][0]}
-                    </text>
-                  </g>
-                  <g id="trans-line-y-label">
-                    <rect
-                      x={percentX(
-                        translate(selectedObjectPoint, transVector)[0]
-                      )}
-                      y={percentY(
-                        (selectedObjectPoint[1] +
-                          translate(selectedObjectPoint, transVector)[1]) /
-                          2
-                      )}
-                      width={80 / zoom}
-                      height={80 / zoom}
-                      fill="white"
-                      opacity={0.8}
-                      transform={`translate(${-40 / zoom} ${-40 / zoom})`}
-                      rx={30 / zoom}
-                      ry={30 / zoom}
-                    />
-                    <text
-                      x={percentX(
-                        translate(selectedObjectPoint, transVector)[0]
-                      )}
-                      y={percentY(
-                        (selectedObjectPoint[1] +
-                          translate(selectedObjectPoint, transVector)[1]) /
-                          2
-                      )}
-                      fill="darkslategray"
-                      fontSize={40 / zoom}
-                      textAnchor="middle"
-                      alignmentBaseline="middle"
-                    >
-                      {Math.abs(transVector[1][1] - transVector[0][1])}
-                    </text>
-                  </g>
+                  {transVector[1][0] - transVector[0][0] !== 0 && (
+                    <g>
+                      <line
+                        name="translation-line-x"
+                        x1={percentX(selectedObjectPoint[0])}
+                        y1={percentY(selectedObjectPoint[1])}
+                        x2={percentX(
+                          translate(selectedObjectPoint, transVector)[0]
+                        )}
+                        y2={percentY(selectedObjectPoint[1])}
+                        stroke="grey"
+                        opacity={0.6}
+                        strokeWidth={10 / zoom}
+                        strokeDasharray="none"
+                        markerEnd="url(#arrow)"
+                      />
+                      <g id="trans-line-x-label">
+                        <rect
+                          x={percentX(
+                            (selectedObjectPoint[0] +
+                              translate(selectedObjectPoint, transVector)[0]) /
+                              2
+                          )}
+                          y={percentY(selectedObjectPoint[1])}
+                          width={80 / zoom}
+                          height={80 / zoom}
+                          fill="white"
+                          opacity={0.8}
+                          transform={`translate(${-40 / zoom} ${-40 / zoom})`}
+                          rx={30 / zoom}
+                          ry={30 / zoom}
+                        />
+                        <text
+                          x={percentX(
+                            (selectedObjectPoint[0] +
+                              translate(selectedObjectPoint, transVector)[0]) /
+                              2
+                          )}
+                          y={percentY(selectedObjectPoint[1])}
+                          fill="darkslategray"
+                          fontSize={40 / zoom}
+                          textAnchor="middle"
+                          alignmentBaseline="middle"
+                        >
+                          {transVector[1][0] - transVector[0][0]}
+                        </text>
+                      </g>
+                    </g>
+                  )}
+                  {transVector[1][1] - transVector[0][1] !== 0 && (
+                    <g>
+                      <line
+                        name="translation-line-y"
+                        x1={percentX(
+                          translate(selectedObjectPoint, transVector)[0]
+                        )}
+                        y1={percentY(selectedObjectPoint[1])}
+                        x2={percentX(
+                          translate(selectedObjectPoint, transVector)[0]
+                        )}
+                        y2={percentY(
+                          translate(selectedObjectPoint, transVector)[1]
+                        )}
+                        stroke="grey"
+                        opacity={0.6}
+                        strokeWidth={10 / zoom}
+                        strokeDasharray="none"
+                        markerEnd="url(#arrow)"
+                      />
+                      <g id="trans-line-y-label">
+                        <rect
+                          x={percentX(
+                            translate(selectedObjectPoint, transVector)[0]
+                          )}
+                          y={percentY(
+                            (selectedObjectPoint[1] +
+                              translate(selectedObjectPoint, transVector)[1]) /
+                              2
+                          )}
+                          width={80 / zoom}
+                          height={80 / zoom}
+                          fill="white"
+                          opacity={0.8}
+                          transform={`translate(${-40 / zoom} ${-40 / zoom})`}
+                          rx={30 / zoom}
+                          ry={30 / zoom}
+                        />
+                        <text
+                          x={percentX(
+                            translate(selectedObjectPoint, transVector)[0]
+                          )}
+                          y={percentY(
+                            (selectedObjectPoint[1] +
+                              translate(selectedObjectPoint, transVector)[1]) /
+                              2
+                          )}
+                          fill="darkslategray"
+                          fontSize={40 / zoom}
+                          textAnchor="middle"
+                          alignmentBaseline="middle"
+                        >
+                          {Math.abs(transVector[1][1] - transVector[0][1])}
+                        </text>
+                      </g>
+                    </g>
+                  )}
                   {showCoords && (
                     <>
                       <text
@@ -2375,6 +2503,79 @@ function Graph({
                   )}
                 </>
               )}
+            {/* for dragging points */}
+            {selectedObjectPoint && selectedObjectPoint.length > 0 && (
+              <circle
+                name="selected-object-point-drag"
+                cx={percentX(selectedObjectPoint[0])}
+                cy={percentY(selectedObjectPoint[1])}
+                r={80 / zoom}
+                fill={color1}
+                opacity={0}
+                onMouseDown={dragPointStart}
+                className="cursor-move"
+              />
+            )}
+            {centerOfRotation && centerOfRotation.length > 0 && (
+              <circle
+                name="rotation-center-drag"
+                cx={percentX(centerOfRotation[0])}
+                cy={percentY(centerOfRotation[1])}
+                r={80 / zoom}
+                fill={color1}
+                opacity={0}
+                onMouseDown={() => {
+                  setDraggingSpecialPoint("center-of-rotation");
+                  setDraggingSomething(true);
+                }}
+                className="cursor-move"
+              />
+            )}
+            {centerOfEnlargement && centerOfEnlargement.length > 0 && (
+              <circle
+                name="enlargement-center-drag"
+                cx={percentX(centerOfEnlargement[0])}
+                cy={percentY(centerOfEnlargement[1])}
+                r={80 / zoom}
+                fill={color1}
+                opacity={0}
+                onMouseDown={() => {
+                  setDraggingSpecialPoint("center-of-enlargement");
+                  setDraggingSomething(true);
+                }}
+                className="cursor-move"
+              />
+            )}
+            {transVector && transVector.length > 0 && (
+              <circle
+                name="trans-vector-1-drag"
+                cx={percentX(transVector[0][0])}
+                cy={percentY(transVector[0][1])}
+                r={80 / zoom}
+                fill={color1}
+                opacity={0}
+                onMouseDown={() => {
+                  setDraggingSpecialPoint("trans-vector-1");
+                  setDraggingSomething(true);
+                }}
+                className="cursor-move"
+              />
+            )}
+            {transVector && transVector.length > 0 && (
+              <circle
+                name="trans-vector-2-drag"
+                cx={percentX(transVector[1][0])}
+                cy={percentY(transVector[1][1])}
+                r={80 / zoom}
+                fill={color1}
+                opacity={0}
+                onMouseDown={() => {
+                  setDraggingSpecialPoint("trans-vector-2");
+                  setDraggingSomething(true);
+                }}
+                className="cursor-move"
+              />
+            )}
           </svg>
         </div>
       </div>
@@ -2398,6 +2599,7 @@ function Graph({
               setObjects({});
               setSelectedObjectPoint(null);
               setSelectedObject("");
+              setIsSelectedPointInSelectedObject(false);
             }
           )}
 

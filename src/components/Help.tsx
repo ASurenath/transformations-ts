@@ -88,7 +88,7 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
         <>
           <div
             className="tools fixed flex flex-col justify-center items-start p-1"
-            style={{ height: "100vh" }}
+            style={{ transform: 'translateY(calc(50vh - 80px))' }}
           >
             <button
               type="button"
@@ -131,7 +131,7 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
 
       <div
         className="tools fixed flex flex-wrap justify-start items-start p-1"
-        style={{ width: "100vw" }}
+        // style={{ width: "100vw" }}
       >
         <select
           disabled
@@ -242,7 +242,7 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
             </button>
 
             <div
-              className={`relative mt-2 w-50 flex ${
+              className={`relative  w-50 flex ${
                 step == 4 ? "help-glow" : "opacity-0"
               }`}
               ref={angleDemo}
@@ -252,7 +252,7 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                 value={90}
                 min={0}
                 max={360}
-                className="peer w-25"
+                className="peer w-25 mt-3"
               />
               <input
                 type="number"
@@ -262,7 +262,7 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
               />
               <label
                 htmlFor="angle-input"
-                className="absolute top-2 left-1 z-10 origin-[0] -translate-y-4 scale-75 transform cursor-text select-none bg-white px-2 text-sm text-gray-500 duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:px-2 peer-focus:text-blue-600"
+                className="absolute top-3.5 left-1 z-10 origin-[0] -translate-y-4 scale-75 transform cursor-text select-none bg-white px-2 text-sm text-gray-500 duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:px-2 peer-focus:text-blue-600"
               >
                 {" "}
                 Rotation angle (deg){" "}
@@ -455,7 +455,7 @@ function Help({ handleClose, handleClose2, helpFor }: { handleClose: any, handle
                 their
                 <span className={`text-[${color2}]`}> transformation </span>. Or
                 select <span className={`text-[${color1}]`}>objects</span> to
-                delete.
+                delete. You can aslo move selected <span className={`text-[${color1}]`}>points</span> and <span className={`text-[${color1}]`}>objects.</span>
                 {renderSkipBtn(true)}
               </div>
             )}
