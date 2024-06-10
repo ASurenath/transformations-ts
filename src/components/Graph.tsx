@@ -389,6 +389,9 @@ function Graph({
     if (tool != "mirror") {
       setTempMirrorLinePoints([]);
     }
+    if (tool != "vector") {
+      setTempTransVector([]);
+    }
     if (tool != "select") {
       setSelectedObjectPoint(null);
       setSelectedObject("");
@@ -908,6 +911,9 @@ function Graph({
       if (selectedObject) {
         handleDelete();
       }
+    }
+    if(e.key=="Escape"){
+      setTool("select")
     }
   };
   return (
