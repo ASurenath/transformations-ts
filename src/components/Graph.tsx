@@ -703,11 +703,11 @@ function Graph({
           } else {
             setMirrorLinePoints([temp[0], [x, y]]);
             setTempMirrorLinePoints([]);
-            // setTool("select")
+            setTool("select")
           }
         } else if (tool == "rotCenter") {
           setCenterOfRotation([x, y]);
-          // setTool("select")
+          setTool("select")
         } else if (tool == "vector") {
           let temp = tempTransVector;
           if (temp?.length == 0) {
@@ -715,7 +715,7 @@ function Graph({
           } else if (temp) {
             setTransVector([temp[0], [x, y]]);
             setTempTransVector([]);
-            // setTool("select")
+            setTool("select")
           }
         } else if (tool == "select") {
           if (
