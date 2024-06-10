@@ -1726,57 +1726,7 @@ function Graph({
                 ></polygon>
               </>
             ))}
-            {/* selection  for delete*/}
-            {selectedObject && (
-              <g>
-                <rect
-                  name="selection-object"
-                  x={percentX(selectionCoordinates.x1)}
-                  height={
-                    percentY(selectionCoordinates.y1) -
-                    percentY(selectionCoordinates.y2)
-                  }
-                  y={percentY(selectionCoordinates.y2)}
-                  width={
-                    percentX(selectionCoordinates.x2) -
-                    percentX(selectionCoordinates.x1)
-                  }
-                  stroke={color1}
-                  fill="none"
-                  strokeWidth={15 / zoom}
-                  strokeDasharray={`${30 / zoom} ${15 / zoom}`}
-                />
-                <g
-                  onClick={handleDelete}
-                  className="cursor-pointer"
-                  xlinkTitle="delete"
-                >
-                  <rect
-                    name="delete-box"
-                    x={percentX(selectionCoordinates.x2) - 40 / zoom}
-                    height={80 / zoom}
-                    y={percentY(selectionCoordinates.y2) - 40 / zoom}
-                    width={80 / zoom}
-                    rx={30 / zoom}
-                    ry={30 / zoom}
-                    stroke={color1}
-                    fill="white"
-                    strokeWidth={10 / zoom}
-                  ></rect>
-                  <text
-                    name="delete-text"
-                    x={percentX(selectionCoordinates.x2)}
-                    y={percentY(selectionCoordinates.y2)}
-                    fill={color1}
-                    fontSize={80 / zoom}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                  >
-                    x
-                  </text>
-                </g>
-              </g>
-            )}
+
             {/* point selection */}
             {selectedObjectPoint &&
               selectedObjectPoint.length > 0 &&
@@ -2528,6 +2478,7 @@ function Graph({
                   )}
                 </>
               )}
+
             {/* for dragging points */}
             {selectedObjectPoint && selectedObjectPoint.length > 0 && (
               <circle
@@ -2541,6 +2492,7 @@ function Graph({
                 className="cursor-move"
               />
             )}
+
             {centerOfRotation && centerOfRotation.length > 0 && (
               <circle
                 name="rotation-center-drag"
@@ -2600,6 +2552,57 @@ function Graph({
                 }}
                 className="cursor-move"
               />
+            )}
+                                    {/* selection  for delete*/}
+                                    {selectedObject && (
+              <g>
+                <rect
+                  name="selection-object"
+                  x={percentX(selectionCoordinates.x1)}
+                  height={
+                    percentY(selectionCoordinates.y1) -
+                    percentY(selectionCoordinates.y2)
+                  }
+                  y={percentY(selectionCoordinates.y2)}
+                  width={
+                    percentX(selectionCoordinates.x2) -
+                    percentX(selectionCoordinates.x1)
+                  }
+                  stroke={color1}
+                  fill="none"
+                  strokeWidth={15 / zoom}
+                  strokeDasharray={`${30 / zoom} ${15 / zoom}`}
+                />
+                <g
+                  onClick={handleDelete}
+                  className="cursor-pointer"
+                  xlinkTitle="delete"
+                >
+                  <rect
+                    name="delete-box"
+                    x={percentX(selectionCoordinates.x2) - 40 / zoom}
+                    height={80 / zoom}
+                    y={percentY(selectionCoordinates.y2) - 40 / zoom}
+                    width={80 / zoom}
+                    rx={30 / zoom}
+                    ry={30 / zoom}
+                    stroke={color1}
+                    fill="white"
+                    strokeWidth={10 / zoom}
+                  ></rect>
+                  <text
+                    name="delete-text"
+                    x={percentX(selectionCoordinates.x2)}
+                    y={percentY(selectionCoordinates.y2)}
+                    fill={color1}
+                    fontSize={80 / zoom}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                  >
+                    x
+                  </text>
+                </g>
+              </g>
             )}
           </svg>
         </div>
