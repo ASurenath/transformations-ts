@@ -22,7 +22,7 @@ function Help({ handleClose, handleClose2, helpFor,transformation }: { handleClo
   const enEquationDemo = useRef<HTMLParagraphElement>(null);
   const color1: string = "#1783b8";
   const color2: string = "#4dc0ae";
-  console.log(step);
+  // console.log(step);
 
   useEffect(() => {
     if (
@@ -50,9 +50,9 @@ function Help({ handleClose, handleClose2, helpFor,transformation }: { handleClo
   };
   const getPos = (ref: any) => {
     // if (!ref.current) return {};
-    console.log(ref.current);
+    // console.log(ref.current);
     const rect = ref.current.getBoundingClientRect();
-    console.log(rect);
+    // console.log(rect);
     return {
       x: rect.x,
       y: rect.y,

@@ -280,7 +280,7 @@ function Graph({
     setSelectedPointIndexInSelectedObject,
   ] = useState<number>(0);
 
-  // console.log(objects);
+  // // // console.log(objects);
   useEffect(() => {
     if (transformation !== "reflection") {
       if (!isVisited[transformation as keyof typeof isVisited]) {
@@ -311,7 +311,7 @@ function Graph({
       clearTimeout(timeoutId);
     };
   }, [enlargementFactor]);
-  // console.log(isVisited);
+  // // // console.log(isVisited);
 
   // reflection
   useEffect(() => {
@@ -323,7 +323,7 @@ function Graph({
           reflect(point, mirrorLinePoints)
         );
         tempReflectImages[key] = [...tempImage];
-        // console.log("tempImage", tempImage);
+        // // console.log("tempImage", tempImage);
       }
       setReflectImages({ ...tempReflectImages });
     } else {
@@ -402,14 +402,14 @@ function Graph({
   // initial scroll
   useEffect(() => {
     if (scrollBox.current) {
-      // console.log("scrollBox.current", scrollBox.current);
+      // // console.log("scrollBox.current", scrollBox.current);
       const scrollLeft =
         ((x2 - x1) * zoomFactor * zoom) / 200 -
         scrollBox.current.clientWidth / 2;
       const scrollTop =
         ((y2 - y1) * zoomFactor * zoom) / 200 -
         scrollBox.current.clientHeight / 2;
-      // console.log("scrollTop", scrollTop, "scrollLeft", scrollLeft);
+      // // console.log("scrollTop", scrollTop, "scrollLeft", scrollLeft);
       scrollBox.current.scrollTop = scrollTop;
       scrollBox.current.scrollLeft = scrollLeft;
     }
@@ -577,12 +577,12 @@ function Graph({
       let oldScrollY = scrollBox.current.scrollTop;
       let focusX = oldScrollX + x;
       let focusY = oldScrollY + y;
-      // console.log("scrollBox.current", scrollBox.current);
+      // // console.log("scrollBox.current", scrollBox.current);
       const scrollLeft =
         (focusX * z) / oldZoom - scrollBox.current.clientWidth / 2 || 0;
       const scrollTop =
         (focusY * z) / oldZoom - scrollBox.current.clientHeight / 2 || 0;
-      // console.log("scrollTop", scrollTop, "scrollLeft", scrollLeft);
+      // // console.log("scrollTop", scrollTop, "scrollLeft", scrollLeft);
       scrollBox.current.scrollTop = scrollTop;
       scrollBox.current.scrollLeft = scrollLeft;
     }
@@ -654,7 +654,7 @@ function Graph({
       }
     }
   };
-  console.log(tempMirrorLinePoints);
+  // console.log(tempMirrorLinePoints);
 
   const handleClick = (e: any) => {
     if (graphBox.current) {
@@ -673,7 +673,7 @@ function Graph({
       if (x > x1 && x < x2 && y > y1 && y < y2) {
         if (tool == "polygon") {
           let temp = tempObjectPoints;
-          // console.log(temp.length);
+          // // console.log(temp.length);
           // if(temp.length<=1){
           //   setObjectPoints([])
           // }
@@ -687,18 +687,18 @@ function Graph({
               }
               setObjects({ ...objects, [id]: [...tempObjectPoints] });
               setTempObjectPoints([]);
-              console.log("includes");
+              // console.log("includes");
               setSelectedObject(id);
               setTool("select");
             }
             // setTool("select")
           } else {
-            console.log("not includes");
+            // console.log("not includes");
             setTempObjectPoints([...tempObjectPoints, [x, y]]);
           }
         } else if (tool == "mirror") {
           let temp: [number, number][] = tempMirrorLinePoints;
-          // console.log(temp.length);
+          // // console.log(temp.length);
           if (temp.length == 0) {
             setTempMirrorLinePoints([[x, y]]);
           } else {
@@ -725,13 +725,13 @@ function Graph({
               .some((point) => point.join(",") === `${x},${y}`)
           ) {
             setSelectedObjectPoint([x, y]);
-            console.log("object removed");
+            // console.log("object removed");
             setSelectedObject("");
             setIsSelectedPointInSelectedObject(false);
           } else {
             // if(!draggingSomething){setSelectedObjectPoint(null);}
             if (selectedObject && !e.target.closest(".objects-polygons")) {
-              console.log("no polygon");
+              // console.log("no polygon");
               if (
                 selectionCoordinates.x1 > x ||
                 selectionCoordinates.x2 < x ||
@@ -799,11 +799,11 @@ function Graph({
       percentX(x1 + (x1 - x2) / Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)),
       percentY(y1 + (y1 - y2) / Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)),
     ];
-    console.log(coords);
+    // console.log(coords);
     return coords;
   };
   const handleDragObjectStart = (e: any, key: string) => {
-    console.log("drag start", key);
+    // console.log("drag start", key);
 
     e = e.touches?.[0] || e;
     if (graphBox.current && selectedObject) {
@@ -834,12 +834,12 @@ function Graph({
   const dragPointStart = () => {
     let tempDragPoints: [string, number][] = [];
     for (let key of Object.keys(objects)) {
-      console.log(key);
-      console.log(objects[key]);
+      // console.log(key);
+      // console.log(objects[key]);
       for (let i = 0; i < objects[key].length; i++) {
         let point = objects[key][i];
-        console.log("point", point);
-        console.log("selectedObjectPoint", selectedObjectPoint);
+        // console.log("point", point);
+        // console.log("selectedObjectPoint", selectedObjectPoint);
         if (
           point[0] === selectedObjectPoint?.[0] &&
           point[1] === selectedObjectPoint?.[1]
@@ -904,11 +904,11 @@ function Graph({
         setIsSelectedPointInSelectedObject(false);
       }
     }
-    // console.log("object selected");
+    // // console.log("object selected");
   };
   const handleKeyDown = (e: any) => {
     if (e.key == "Delete"||e.key=="Backspace") {
-      console.log("delete");
+      // // console.log("delete");
       if (selectedObject) {
         handleDelete();
       }
