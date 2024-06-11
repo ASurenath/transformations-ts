@@ -723,7 +723,7 @@ function Help({ handleClose, handleClose2, helpFor,transformation }: { handleClo
               <div
                 className="p-4 absolute  text-base md:text-2xl"
                 style={{
-                  top: `${getPos(rotEquationDemo).y + 10}px`,
+                  top: `${getPos(rotEquationDemo).y + 40}px`,
                 }}
               >
                 <div
