@@ -92,3 +92,6 @@
   border: 3px solid transparent;
   border-image: url(vector-border.png) 30 stretch;
 }
+.hidden{
+  display: none;
+}

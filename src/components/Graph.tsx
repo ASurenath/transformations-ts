@@ -192,6 +192,7 @@ function Graph({
   const [showCoords, setShowCoords] = useState<boolean>(false);
   const [isChangeInAngle, setIsChangeInAngle] = useState<boolean>(false);
   const [isChangeInScale, setIsChangeInScale] = useState<boolean>(false);
+  const [showEquation, setShowEquation] = useState<boolean>(true);
   // object
   const [objects, setObjects] = useState<objectsState>({
     demo: [
@@ -1026,14 +1027,20 @@ function Graph({
                 >
                   <i className="fa-solid fa-slash"></i>
                 </button>
-                <p
-                  className={`mx-1 p-1 ${tempMirrorLinePoints.length > 0 ?'bg-yellow-100':'bg-white' } rounded border border-2 border-[${color1}]`}
+                <div
+                  className={`flex justify-between mx-1 p-1 ${tempMirrorLinePoints.length > 0 ?'bg-yellow-100':'bg-white' } rounded border border-2 border-[${color1}] expand-container ${showEquation&&'expanded'}`}
                 >
-                  Reflection on the line{" "}
-                  <span className="font-bold text-[#800080]">
-                    {lineEquation(mirrorLinePoints)}
-                  </span>
-                </p>
+                  <p className={`${showEquation?'':'hidden'}`}>
+                      Reflection on the line{" "}
+                      <span className="font-bold text-[#800080]">
+                        {lineEquation(mirrorLinePoints)}
+                      </span>
+                  
+                  </p>
+                  <button className={`${showEquation&&'ms-8'} block`} onClick={() => setShowEquation(!showEquation)}>
+                    {showEquation?<i className='fa-solid fa-chevron-left'></i>:<>Show description <i className='fa-solid fa-chevron-right'></i></>}
+                      </button>
+                </div>
               </>
             )}
 
@@ -1116,22 +1123,27 @@ function Graph({
                   </label>
                   {/* <div className="absolute right-1 top-1/2 -translate-y-1/2 bg-white py-1 px-1 text-gray-300 peer-placeholder-shown:text-white peer-focus:text-gray-300">°</div> */}
                 </div>
-                <p
-                  className={`mx-1 p-1 bg-white rounded border border-2 border-[${color1}] ${(draggingSpecialPoint=="center-of-rotation")||isChangeInAngle?"bg-yellow-100":"bg-white"}`}
+                <div
+                  className={`mx-1 p-1 flex justify-between bg-white rounded border border-2 border-[${color1}] ${(draggingSpecialPoint=="center-of-rotation")||isChangeInAngle?"bg-yellow-100":"bg-white"}`}
                 >
-                  <span className="font-bold text-[#800080]">
-                    {rotationAngle}°{" "}
-                  </span>
-                  rotation about the point{" "}
-                  <span className="font-bold text-[#800080]">
-                    ({centerOfRotation?.[0]}, {centerOfRotation?.[1]})
-                  </span>{" "}
-                  in{" "}
-                  <span className="font-bold text-[#800080]">
-                    {isClockwise ? "clockwise" : "counterclockwise"}
-                  </span>{" "}
-                  direction.
-                </p>
+                  <div className={`${showEquation?'':'hidden'}`}>
+                    <span className="font-bold text-[#800080]">
+                      {rotationAngle}°{" "}
+                    </span>
+                    rotation about the point{" "}
+                    <span className="font-bold text-[#800080]">
+                      ({centerOfRotation?.[0]}, {centerOfRotation?.[1]})
+                    </span>{" "}
+                    in{" "}
+                    <span className="font-bold text-[#800080]">
+                      {isClockwise ? "clockwise" : "counterclockwise"}
+                    </span>{" "}
+                    direction.
+                  </div>
+                  <button className={`${showEquation&&'ms-8'} block`} onClick={() => setShowEquation(!showEquation)}>
+                    {showEquation?<i className='fa-solid fa-chevron-left'></i>:<>Show description <i className='fa-solid fa-chevron-right'></i></>}
+                      </button>
+                </div>
               </>
             )}
             {transformation == "translation" && (
@@ -1149,16 +1161,21 @@ function Graph({
                     style={{ "--fa-rotate-angle": "45deg" } as any}
                   />
                 </button>
-                <div className={`flex m-0 mx-1 p-1 px-1 bg-white rounded border border-2 border-[${color1}] ${(draggingSpecialPoint=="trans-vector-1")||(draggingSpecialPoint=="trans-vector-2")?"bg-yellow-100":"bg-white"}`}>
-                  <div className="p-1.5">Translation by the vector </div>
-                    <div className="inline-flex flex-col vector p-0 px-1 m-0 text-sm justify-center">
-                      <div className="p-0 m-0 leading-4 text-[#800080]">
-                        {transVector[1][0] - transVector[0][0]}
-                      </div>
-                      <div className="p-0 m-0 leading-4 text-[#800080]">
-                        {transVector[1][1] - transVector[0][1]}
-                      </div>
-                    </div>
+                <div className={`flex justify-between m-0 mx-1 p-1 px-1 bg-white rounded border border-2 border-[${color1}] ${(draggingSpecialPoint=="trans-vector-1")||(draggingSpecialPoint=="trans-vector-2")?"bg-yellow-100":"bg-white"}`}>
+                   <div className={`flex ${showEquation?'':'hidden'}`}>
+                      <div className={`p-1.5`}>Translation by the vector </div>
+                        <div className={`inline-flex flex-col vector p-0 px-1 m-0 text-sm justify-center`}>
+                          <div className="p-0 m-0 leading-4 text-[#800080]">
+                            {transVector[1][0] - transVector[0][0]}
+                          </div>
+                          <div className="p-0 m-0 leading-4 text-[#800080]">
+                            {transVector[1][1] - transVector[0][1]}
+                          </div>
+                        </div>
+                   </div>
+                  <button className={`${showEquation&&'ms-8'} block`} onClick={() => setShowEquation(!showEquation)}>
+                    {showEquation?<i className='fa-solid fa-chevron-left'></i>:<>Show description <i className='fa-solid fa-chevron-right'></i></>}
+                      </button>
                 </div>
               </>
             )}
@@ -1224,25 +1241,29 @@ function Graph({
                     step={0.1}
                   />
                 </div>
-                <p className={`mx-1 p-2 bg-white rounded border border-2 border-[${color1}] ${(draggingSpecialPoint=="center-of-enlargement")||isChangeInScale?"bg-yellow-100":"bg-white"}`}>
-                  {" "}
-                  Enlargement w.r.t. the point{" "}
-                  <span className="font-bold text-[#800080]">
-                    ({centerOfEnlargement[0]}, {centerOfEnlargement[1]} )
-                  </span>{" "}
-                  by the factor{" "}
-                  <span className="font-bold text-[#800080]">
-                    {enlargementFactor}
-                  </span>
-                  . {renderScaleDescription(enlargementFactor)}
-                </p>
+                <div className={`mx-1 p-2 flex justify-between bg-white rounded border border-2 border-[${color1}] ${(draggingSpecialPoint=="center-of-enlargement")||isChangeInScale?"bg-yellow-100":"bg-white"}`}>
+                  <div className={`${showEquation?'':'hidden'}`}>
+                    Enlargement w.r.t. the point{" "}
+                    <span className="font-bold text-[#800080]">
+                      ({centerOfEnlargement[0]}, {centerOfEnlargement[1]} )
+                    </span>{" "}
+                    by the factor{" "}
+                    <span className="font-bold text-[#800080]">
+                      {enlargementFactor}
+                    </span>
+                    . {renderScaleDescription(enlargementFactor)}
+                  </div>
+                  <button className={`${showEquation&&'ms-8'} block`} onClick={() => setShowEquation(!showEquation)}>
+                    {showEquation?<i className='fa-solid fa-chevron-left'></i>:<>Show description <i className='fa-solid fa-chevron-right'></i></>}
+                      </button>
+                </div>
               </>
             )}
           </div>
           <div className="tools fixed flex-col justify-center items-center bottom-4 right-9">
             <button
               type="button"
-              onClick={() => setTool("zoomIn")}
+              onClick={()=>{zoom+10<400?handleZoom1(zoom+10):handleZoom1(400)}}
               className={`m-1 bg-[${color1}]  text-white p-1 px-2 rounded block`}
             >
               <i className="fa-solid fa-magnifying-glass-plus" />
@@ -1256,7 +1277,7 @@ function Graph({
             </button>
             <button
               type="button"
-              onClick={() => setTool("zoomOut")}
+              onClick={() =>{zoom-10>minZoom?handleZoom1(zoom-10):handleZoom1(minZoom)}}
               className={`m-1 bg-[${color1}] text-white p-1 px-2 rounded block`}
             >
               <i className="fa-solid fa-magnifying-glass-minus" />

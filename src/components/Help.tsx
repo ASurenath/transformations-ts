@@ -5,6 +5,7 @@ function Help({ handleClose, handleClose2, helpFor,transformation }: { handleClo
   const polygonDemo = useRef<HTMLButtonElement>(null);
   const selectDemo = useRef<HTMLButtonElement>(null);
   const deleteDemo = useRef<HTMLButtonElement>(null);
+  const xyDemo = useRef<HTMLButtonElement>(null);
   const selectTransDemo = useRef<HTMLSelectElement>(null);
   const infoDemo = useRef<HTMLButtonElement>(null);
   const mirrorDemo = useRef<HTMLButtonElement>(null);
@@ -25,15 +26,21 @@ function Help({ handleClose, handleClose2, helpFor,transformation }: { handleClo
 
   useEffect(() => {
     if (
-      (step >= 7 && helpFor == "general") ||
+      (step >= 8 && helpFor == "general") ||
       (step >= 5 && helpFor == "reflection") ||
       (step >= 7 && helpFor == "rotation") ||
       (step >= 5 && helpFor == "translation") ||
-      (step >= 6 && helpFor == "enlargement")
+      (step >= 6 && helpFor == "enlargement")||
+      (step<0)
     ) {
       handleClose();
     }
   }, [step]);
+  useEffect(() => {
+    if(document.getElementById("help")){
+      document.getElementById("help")!.focus();
+    }
+  })
 
   const incrementStep = () => {
     setStep(step + 1);
@@ -82,8 +89,17 @@ function Help({ handleClose, handleClose2, helpFor,transformation }: { handleClo
     );
   };
 
+  const handleKeyDown = (e: any) => {
+    if (e.key === "Escape") {
+      handleClose();
+    }
+    if (e.key === "Enter"||e.key=="ArrowRight"||e.key==" ") {
+      incrementStep();
+    }
+  };
+
   return (
-    <div className="help text-bold">
+    <div className="help text-bold" tabIndex={0} onKeyDown={handleKeyDown} id="help">
       {helpFor == "general" && (
         <>
           <div
@@ -121,7 +137,10 @@ function Help({ handleClose, handleClose2, helpFor,transformation }: { handleClo
             <button
               type="button"
               className={`m-1 bg-[${color1
-              }] text-white p-1 px-0.5 rounded crossed} opacity-0`}
+              }] text-white p-1 px-0.5 rounded crossed ${
+                step == 5 ? "help-glow" : "opacity-0"
+              }`}
+              ref={xyDemo}
             >
               (x,y)
             </button>
@@ -138,7 +157,7 @@ function Help({ handleClose, handleClose2, helpFor,transformation }: { handleClo
           value={helpFor}
           ref={selectTransDemo}
           className={`p-1 mb-1 bg-white rounded border border-2 border-[${color1}] ${
-            step == 5 && helpFor == "general" ? "help-glow" : "opacity-0"
+            step == 6 && helpFor == "general" ? "help-glow" : "opacity-0"
           }`}
         >
           {transformation == "rotation" && <option value="rotation">Rotation</option>}
@@ -156,7 +175,7 @@ function Help({ handleClose, handleClose2, helpFor,transformation }: { handleClo
         <button
           type="button"
           className={`mx-1 bg-[${color1}] text-white p-1 px-3 rounded ${
-            step == 6 && helpFor == "general" ? "help-glow" : "opacity-0"
+            step == 7 && helpFor == "general" ? "help-glow" : "opacity-0"
           }`}
           ref={infoDemo}
         >
@@ -175,13 +194,18 @@ function Help({ handleClose, handleClose2, helpFor,transformation }: { handleClo
               <i className="fa-solid fa-slash"></i>
             </button>
             <p
-              className={`mx-1 p-1 bg-white rounded border border-2 border-[${color1}] ${
+              className={`mx-1 flex justify-between p-1 bg-white rounded border border-2 border-[${color1}] ${
                 step == 3 ? "help-glow" : "opacity-0"
               }`}
               ref={refEquationDemo}
             >
-              Reflection on the line{" "}
-              <span className="font-bold text-[#800080]">y=x+5</span>
+              <div>
+                Reflection on the line{" "}
+                <span className="font-bold text-[#800080]">y=x+5</span>
+              </div>
+              <button className='ms-8 block'>
+                    <i className='fa-solid fa-chevron-left'></i>
+                      </button>
             </p>
           </>
         )}
@@ -269,17 +293,22 @@ function Help({ handleClose, handleClose2, helpFor,transformation }: { handleClo
               </label>
               {/* <div className="absolute right-1 top-1/2 -translate-y-1/2 bg-white py-1 px-1 text-gray-300 peer-placeholder-shown:text-white peer-focus:text-gray-300">°</div> */}
             </div>
-            <p
-              className={`mx-1 p-1 bg-white rounded border border-2 border-[${color1}] ${
+            <div
+              className={`mx-1 p-1 flex justify-between bg-white rounded border border-2 border-[${color1}] ${
                 step == 5 ? "help-glow" : "opacity-0"
               }`}
               ref={rotEquationDemo}
             >
-              <span className=" text-[#800080]">{90}° </span>
-              rotation about the point{" "}
-              <span className=" text-[#800080]">(2, 3)</span> in{" "}
-              <span className=" text-[#800080]">clockwise</span> direction.
-            </p>
+             <div>
+                <span className=" text-[#800080]">{90}° </span>
+                rotation about the point{" "}
+                <span className=" text-[#800080]">(2, 3)</span> in{" "}
+                <span className=" text-[#800080]">clockwise</span> direction.
+             </div>
+              <button className='ms-8 block'>
+                    <i className='fa-solid fa-chevron-left'></i>
+                      </button>
+            </div>
           </>
         )}
         {helpFor == "translation" && (
@@ -293,24 +322,29 @@ function Help({ handleClose, handleClose2, helpFor,transformation }: { handleClo
             >
               <i
                 className="fa-solid fa-arrow-up-long fa-rotate-by"
-                // style={{ "--fa-rotate-angle": "45deg" }} //fic later
+                style={{ "--fa-rotate-angle": "45deg" }as any}
               />
             </button>
             <div
-              className={`flex m-0 mx-1 p-1 px-1 bg-white rounded border border-2 border-[${color1}] ${
+              className={`flex justify-between m-0 mx-1 p-1 px-1 bg-white rounded border border-2 border-[${color1}] ${
                 step == 3 ? "help-glow" : "opacity-0"
               }`}
               ref={transEquationDemo}
             >
-               <div className="p-1.5">Translation by the vector </div>
-                    <div className="inline-flex flex-col vector p-0 px-1 m-0 text-sm justify-center">
-                      <div className="p-0 m-0 leading-4 text-[#800080]">
-                        {3}
+              <div className="flex">
+                 <div className="p-1.5">Translation by the vector </div>
+                      <div className="inline-flex flex-col vector p-0 px-1 m-0 text-sm justify-center">
+                        <div className="p-0 m-0 leading-4 text-[#800080]">
+                          {3}
+                        </div>
+                        <div className="p-0 m-0 leading-4 text-[#800080]">
+                          {1}
+                        </div>
                       </div>
-                      <div className="p-0 m-0 leading-4 text-[#800080]">
-                        {1}
-                      </div>
-                    </div>
+              </div>
+                    <button className='ms-8 block'>
+                    <i className='fa-solid fa-chevron-left'></i>
+                      </button>
             </div>
           </>
         )}
@@ -357,16 +391,21 @@ function Help({ handleClose, handleClose2, helpFor,transformation }: { handleClo
               />
             </div>
             <p
-              className={`mx-1 p-2 bg-white rounded border border-2 border-[${color1}] ${
+              className={`mx-1 p-2 flex justify-between bg-white rounded border border-2 border-[${color1}] ${
                 step == 4 ? "help-glow" : "opacity-0"
               }`}
               ref={enEquationDemo}
             >
-              {" "}
-              Enlargement w.r.t. the point{" "}
-              <span className=" text-[#800080]">(-9, 9)</span> by the factor{" "}
-              <span className=" text-[#800080]">{2}</span>. Image is <b>bigger</b> than
-              the object as magnitude of the scale factor is <b>greater than 1</b>
+              <div>
+                {" "}
+                Enlargement w.r.t. the point{" "}
+                <span className=" text-[#800080]">(-9, 9)</span> by the factor{" "}
+                <span className=" text-[#800080]">{2}</span>. Image is <b>bigger</b> than
+                the object as magnitude of the scale factor is <b>greater than 1</b>
+              </div>
+              <button className='ms-8 block'>
+                    <i className='fa-solid fa-chevron-left'></i>
+                      </button>
             </p>
           </>
         )}
@@ -474,8 +513,21 @@ function Help({ handleClose, handleClose2, helpFor,transformation }: { handleClo
                 {renderSkipBtn(true)}
               </div>
             )}
-
             {step == 5 && (
+              <div
+                className="p-4 absolute  text-base md:text-2xl"
+                style={{
+                  top: `${getPos(xyDemo).y - 50}px`,
+                  left: `${getPos(xyDemo).x + 50}px`,
+                }}
+              >
+                <i className="fa-regular fa-hand-point-left fa-fade fa-xl"></i>
+                Click on this button to show/hide the coordinates of the <span className={`text-[${color1}]`}>selected point.</span>
+                {renderSkipBtn(true)}
+              </div>
+            )}
+
+            {step == 6 && (
               <>
                 <div
                   className="p-4 absolute  text-base md:text-2xl "
@@ -495,7 +547,7 @@ function Help({ handleClose, handleClose2, helpFor,transformation }: { handleClo
                 </div>
               </>
             )}
-            {step == 6 && (
+            {step == 7 && (
               <>
                 <div
                   className="p-4 absolute  text-base md:text-2xl "
